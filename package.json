@@ -1,0 +1,50 @@
+{
+  "name": "ibankit",
+  "version": "0.1.0",
+  "description": "IBAN utilities",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koblas/ibankit.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/koblas/ibankit",
+  "keywords": [
+    "IBAN"
+  ],
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "ts-jest"
+    },
+    "testRegex": "/test/.*\\.(ts|tsx|js)$"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "jest": "^23.6.0",
+    "prettier": "^1.14.3",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-microsoft-contrib": "^5.2.1",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {}
+}

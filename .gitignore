@@ -1,0 +1,43 @@
+.sass-cache
+postgresql
+*.swp
+/dump.rdb
+/node_modules
+npm-debug.log
+.idea
+.DS_Store
+/.vagrant
+jsonconfig.json
+test.log
+server.log
+install.log
+dist
+env
+mochawesome-reports/
+tmp/*
+build
+/swagger.json
+/doc
+/coverage
+config/conf/local.js
+config/conf/local.yaml
+distSpec
+tsc.output
+
+*\.http
+**/pr_local_bucket
+**/pr_local_public
+**/pr_local_private
+
+# Local files
+.env
+junk/
+.nyc_output
+
+# Ignore
+config/conf/local.yaml
+config/conf/local.json
+config/conf/local.js
+
+# Ignore gnerated files
+/lib/
