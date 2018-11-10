@@ -15,7 +15,7 @@ function randInt(maxVal: number, minVal: number = 0) {
 /**
  * Iban Builder Class
  */
-class IbanBuilder {
+export class IBANBuilder {
   private countryCodeValue?: CountryCode;
   private bankCodeValue?: string;
   private branchCodeValue?: string;
@@ -36,7 +36,7 @@ class IbanBuilder {
    * @param countryCode CountryCode
    * @return builder Builder
    */
-  countryCode(countryCode: CountryCode): IbanBuilder {
+  countryCode(countryCode: CountryCode): IBANBuilder {
     this.countryCodeValue = countryCode;
     return this;
   }
@@ -47,7 +47,7 @@ class IbanBuilder {
    * @param bankCode String
    * @return builder Builder
    */
-  bankCode(bankCode: string): IbanBuilder {
+  bankCode(bankCode: string): IBANBuilder {
     this.bankCodeValue = bankCode;
     return this;
   }
@@ -58,7 +58,7 @@ class IbanBuilder {
    * @param branchCode String
    * @return builder Builder
    */
-  branchCode(branchCode: string): IbanBuilder {
+  branchCode(branchCode: string): IBANBuilder {
     this.branchCodeValue = branchCode;
     return this;
   }
@@ -69,7 +69,7 @@ class IbanBuilder {
    * @param accountNumber String
    * @return builder Builder
    */
-  accountNumber(accountNumber: string): IbanBuilder {
+  accountNumber(accountNumber: string): IBANBuilder {
     this.accountNumberValue = accountNumber;
     return this;
   }
@@ -80,7 +80,7 @@ class IbanBuilder {
    * @param nationalCheckDigit String
    * @return builder Builder
    */
-  nationalCheckDigit(nationalCheckDigit: string): IbanBuilder {
+  nationalCheckDigit(nationalCheckDigit: string): IBANBuilder {
     this.nationalCheckDigitValue = nationalCheckDigit;
     return this;
   }
@@ -91,7 +91,7 @@ class IbanBuilder {
    * @param accountType String
    * @return builder Builder
    */
-  accountType(accountType: string): IbanBuilder {
+  accountType(accountType: string): IBANBuilder {
     this.accountTypeValue = accountType;
     return this;
   }
@@ -102,7 +102,7 @@ class IbanBuilder {
    * @param ownerAccountType String
    * @return builder Builder
    */
-  ownerAccountType(ownerAccountType: string): IbanBuilder {
+  ownerAccountType(ownerAccountType: string): IBANBuilder {
     this.ownerAccountTypeValue = ownerAccountType;
     return this;
   }
@@ -113,7 +113,7 @@ class IbanBuilder {
    * @param identificationNumber String
    * @return builder Builder
    */
-  identificationNumber(identificationNumber: string): IbanBuilder {
+  identificationNumber(identificationNumber: string): IBANBuilder {
     this.identificationNumberValue = identificationNumber;
     return this;
   }
@@ -444,10 +444,25 @@ export class IBAN {
     return ibanUtil.toFormattedString(this.value);
   }
 
+  /**
+   * IBAN Validation testing
+   *
+   * @param {string} iban
+   * @returns {boolean} true if the value is a valid IBAN
+   */
+  static isValid(iban: string): boolean {
+    try {
+      ibanUtil.validate(iban);
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
   static random(cc?: CountryCode): IBAN {
     if (cc !== undefined) {
-      return new IbanBuilder().countryCode(cc).buildRandom();
+      return new IBANBuilder().countryCode(cc).buildRandom();
     }
-    return new IbanBuilder().buildRandom();
+    return new IBANBuilder().buildRandom();
   }
 }

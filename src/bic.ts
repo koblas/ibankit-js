@@ -68,4 +68,18 @@ export class BIC {
   toString(): string {
     return this.value;
   }
+
+  /**
+   * Check to see if a BIC is valid
+   *
+   * @param {string} bic code to check
+   */
+  static isValid(bic: string): boolean {
+    try {
+      bicUtil.validate(bic);
+    } catch {
+      return false;
+    }
+    return true;
+  }
 }
