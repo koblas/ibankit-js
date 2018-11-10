@@ -49,16 +49,6 @@ const bic = BIC("DEUTDEFF");
 BIC.isValid("DEUTDEFF500"); // === true
 ```
 
-#### Maven dependency:
-
-```
-<dependency>
-  <groupId>org.iban4j</groupId>
-  <artifactId>iban4j</artifactId>
-  <version>3.2.1</version>
-</dependency>
-```
-
 #### References
 
 - http://en.wikipedia.org/wiki/ISO_13616
