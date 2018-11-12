@@ -258,43 +258,56 @@ export class IBANBuilder {
       );
     }
 
+    let needCheckDigit = false;
+
     for (const entry of structure.getParts()) {
       switch (entry.getPartType()) {
         case PartType.BANK_CODE:
           if (!this.bankCodeValue) {
-            this.bankCodeValue = entry.getRandom();
+            this.bankCodeValue = entry.generate("", structure);
           }
           break;
         case PartType.BRANCH_CODE:
           if (!this.branchCodeValue) {
-            this.branchCodeValue = entry.getRandom();
+            this.branchCodeValue = entry.generate("", structure);
           }
           break;
         case PartType.ACCOUNT_NUMBER:
           if (!this.accountNumberValue) {
-            this.accountNumberValue = entry.getRandom();
+            this.accountNumberValue = entry.generate("", structure);
           }
           break;
         case PartType.NATIONAL_CHECK_DIGIT:
           if (!this.nationalCheckDigitValue) {
-            this.nationalCheckDigitValue = entry.getRandom();
+            needCheckDigit = true;
+            this.nationalCheckDigitValue = "".padStart(entry.getLength(), "0");
           }
           break;
         case PartType.ACCOUNT_TYPE:
           if (!this.accountTypeValue) {
-            this.accountTypeValue = entry.getRandom();
+            this.accountTypeValue = entry.generate("", structure);
           }
           break;
         case PartType.OWNER_ACCOUNT_NUMBER:
           if (!this.ownerAccountTypeValue) {
-            this.ownerAccountTypeValue = entry.getRandom();
+            this.ownerAccountTypeValue = entry.generate("", structure);
           }
           break;
         case PartType.IDENTIFICATION_NUMBER:
           if (!this.identificationNumberValue) {
-            this.identificationNumberValue = entry.getRandom();
+            this.identificationNumberValue = entry.generate("", structure);
           }
           break;
+      }
+    }
+
+    if (needCheckDigit) {
+      for (const entry of structure.getParts()) {
+        if (entry.getPartType() === PartType.NATIONAL_CHECK_DIGIT) {
+          const bban = this.formatBban();
+
+          this.nationalCheckDigitValue = entry.generate(bban, structure);
+        }
       }
     }
   }

@@ -50,23 +50,26 @@ const charByCharacterRE: Record<CharacterType, RegExp> = {
   [CharacterType.e]: /^ +$/,
 };
 
+type GenerateValue = (bban: string, structure: BbanStructure) => string;
+
 export class BbanStructurePart {
   private entryType: PartType;
   private characterType: CharacterType;
   private length: number;
-
-  validateValue?(value: string, bban: string, structure: BbanStructure): void;
+  generate: GenerateValue;
+  hasGenerator: boolean;
 
   private constructor(
     entryType: PartType,
     characterType: CharacterType,
     length: number,
-    validate?: (value: string, bban: string, structure: BbanStructure) => void,
+    generate?: GenerateValue,
   ) {
     this.entryType = entryType;
     this.characterType = characterType;
     this.length = length;
-    this.validateValue = validate;
+    this.generate = generate || this.defaultGenerator;
+    this.hasGenerator = !!generate;
   }
 
   static bankCode(
@@ -97,13 +100,13 @@ export class BbanStructurePart {
   static nationalCheckDigit(
     length: number,
     characterType: CharacterType,
-    validate?: (value: string, bban: string, structure: BbanStructure) => void,
+    generate?: GenerateValue,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.NATIONAL_CHECK_DIGIT,
       characterType,
       length,
-      validate,
+      generate,
     );
   }
 
@@ -155,7 +158,17 @@ export class BbanStructurePart {
     return this.length;
   }
 
-  getRandom(): string {
+  /**
+   *  Check to see if the string value is valid for the entry
+   */
+  validate(value: string): boolean {
+    return charByCharacterRE[this.characterType].test(value);
+  }
+
+  /**
+   * Default generator to use -- just generate random sequence
+   */
+  private defaultGenerator(bban: string, structure: BbanStructure): string {
     const charChoices = charByCharacterType[this.characterType];
 
     let s: string[] = [];
@@ -164,12 +177,5 @@ export class BbanStructurePart {
     }
 
     return s.join("");
-  }
-
-  /**
-   *  Check to see if the string value is valid for the entry
-   */
-  validate(value: string): boolean {
-    return charByCharacterRE[this.characterType].test(value);
   }
 }

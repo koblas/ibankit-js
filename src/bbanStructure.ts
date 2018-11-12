@@ -20,24 +20,14 @@ function mod11(value: string, weights: number[]) {
  ** Return a function that is a MOD11 national check digit checker
  */
 function nationalFactory(weights: number[]) {
-  return (checkdigit: string, bban: string, structure: BbanStructure) => {
+  return (bban: string, structure: BbanStructure) => {
     const accountNumber = structure.extractValue(bban, PartType.ACCOUNT_NUMBER);
 
     if (accountNumber === null) {
       throw new FormatException(FormatViolation.NOT_EMPTY, "account number");
     }
 
-    const actual = structure.extractValue(bban, PartType.NATIONAL_CHECK_DIGIT);
-    const digit = mod11(accountNumber, weights);
-
-    if (actual !== String(digit)) {
-      throw new FormatException(
-        FormatViolation.NATIONAL_CHECK_DIGIT,
-        `national check digit(s) don't match expect=[${digit}] actual=[${actual}]`,
-        String(digit),
-        String(actual),
-      );
-    }
+    return String(mod11(accountNumber, weights));
   };
 }
 
@@ -92,7 +82,35 @@ export class BbanStructure {
     [CountryCode.BE]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(7, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(
+        2,
+        CharacterType.n,
+        (bban: string, structure: BbanStructure) => {
+          const accountNumber = structure.extractValue(
+            bban,
+            PartType.ACCOUNT_NUMBER,
+          );
+          const bankCode = structure.extractValue(bban, PartType.BANK_CODE);
+
+          if (accountNumber === null || bankCode === null) {
+            throw new FormatException(
+              FormatViolation.NOT_EMPTY,
+              "account number or bank code missing",
+            );
+          }
+
+          const value = parseInt(`${bankCode}${accountNumber}`, 10);
+
+          const remainder = Math.floor(value / 97);
+
+          let expected = value - remainder * 97;
+          if (expected === 0) {
+            expected = 97;
+          }
+
+          return String(expected).padStart(2, "0");
+        },
+      ),
     ),
 
     // Provisional
@@ -236,7 +254,39 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(
+        2,
+        CharacterType.n,
+        (bban: string, structure: BbanStructure) => {
+          const replaceChars = {
+            ["[AJ]"]: "1",
+            ["[BKS]"]: "2",
+            ["[CLT]"]: "3",
+            ["[DMU]"]: "4",
+            ["[ENV]"]: "5",
+            ["[FOW]"]: "6",
+            ["[GPX]"]: "7",
+            ["[HQY]"]: "8",
+            ["[IRZ]"]: "9",
+          };
+          let combined =
+            [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
+              .map(p => String(structure.extractValue(bban, p)))
+              .join("") + "00";
+          Object.entries(replaceChars).map(
+            ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
+          );
+
+          // Number is bigger than max integer, take the mod%97 by hand
+          const expected =
+            97 -
+            combined
+              .split("")
+              .reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
+
+          return String(expected).padStart(2, "0");
+        },
+      ),
     ),
 
     // Provisional
@@ -722,33 +772,43 @@ export class BbanStructure {
     part: BbanStructurePart,
     entryValue: string,
   ) {
-    if (part.validate(entryValue)) {
-      if (part.validateValue) {
-        part.validateValue(entryValue, bban, this);
+    if (!part.validate(entryValue)) {
+      switch (part.getCharacterType()) {
+        case CharacterType.a:
+          throw new FormatException(
+            FormatViolation.BBAN_ONLY_UPPER_CASE_LETTERS,
+            `[${entryValue}] must contain only upper case letters.`,
+            entryValue,
+          );
+        case CharacterType.c:
+          throw new FormatException(
+            FormatViolation.BBAN_ONLY_DIGITS_OR_LETTERS,
+            `[${entryValue}] must contain only digits or letters.`,
+            entryValue,
+          );
+        case CharacterType.n:
+          throw new FormatException(
+            FormatViolation.BBAN_ONLY_DIGITS,
+            `[${entryValue}] must contain only digits.`,
+            entryValue,
+          );
       }
-
-      return;
     }
 
-    switch (part.getCharacterType()) {
-      case CharacterType.a:
+    if (
+      part.getPartType() === PartType.NATIONAL_CHECK_DIGIT &&
+      part.hasGenerator
+    ) {
+      const expected = part.generate(bban, this);
+
+      if (entryValue !== expected) {
         throw new FormatException(
-          FormatViolation.BBAN_ONLY_UPPER_CASE_LETTERS,
-          `[${entryValue}] must contain only upper case letters.`,
+          FormatViolation.NATIONAL_CHECK_DIGIT,
+          `national check digit(s) don't match expect=[${expected}] actual=[${entryValue}]`,
+          expected,
           entryValue,
         );
-      case CharacterType.c:
-        throw new FormatException(
-          FormatViolation.BBAN_ONLY_DIGITS_OR_LETTERS,
-          `[${entryValue}] must contain only digits or letters.`,
-          entryValue,
-        );
-      case CharacterType.n:
-        throw new FormatException(
-          FormatViolation.BBAN_ONLY_DIGITS,
-          `[${entryValue}] must contain only digits.`,
-          entryValue,
-        );
+      }
     }
   }
 }

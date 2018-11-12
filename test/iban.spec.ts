@@ -752,5 +752,13 @@ describe("IBAN", () => {
     it("NO", () => {
       expect(() => new IBAN("NO9386011117948")).toThrow();
     });
+
+    it("BE", () => {
+      expect(() => new IBAN("BE68539007547035")).toThrow();
+    });
+
+    it("FR", () => {
+      expect(() => new IBAN("FR1420041010050500013M02607")).toThrow();
+    });
   });
 });

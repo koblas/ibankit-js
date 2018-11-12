@@ -36,7 +36,7 @@ const iban = IBAN("DE89 3704 0044 0532 0130 00");
 // For testing, the library will also generate random IBANs
 const iban = IBAn.random(CountryCode.AT);
 const iban = IBAN.random();
-const iban = new Iban.Builder()
+const iban = new IBAN.Builder()
   .countryCode(CountryCode.AT)
   .bankCode("19043")
   .buildRandom();
@@ -60,8 +60,8 @@ BIC.isValid("DEUTDEFF500"); // === true
 
 ### TODO
 
-[ ] For random IBANs the National Check digits is random, rather than "valid"
-[ ] Finish writing all national check digit validators (see Oracle spec)
+- [ ] Finish writing all national check digit generators (see Oracle spec)
+- [x] For random IBANs the National Check digits is random, rather than "valid"
 
 #### References
 
