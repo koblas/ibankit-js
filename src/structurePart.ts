@@ -1,8 +1,12 @@
+import { randInt } from "./randInt";
+import { BbanStructure } from "./bbanStructure";
+
 export enum PartType {
   BANK_CODE,
   BRANCH_CODE,
   ACCOUNT_NUMBER,
   NATIONAL_CHECK_DIGIT,
+  CURRENCY_TYPE,
   ACCOUNT_TYPE,
   OWNER_ACCOUNT_NUMBER,
   IDENTIFICATION_NUMBER,
@@ -24,12 +28,26 @@ export enum CharacterType {
    * Upper case alphanumeric characters (A-Z, a-z and 0-9)
    */
   c,
+  /**
+   * Blank space
+   */
+  e,
 }
 
-const charByCharacterType: Record<CharacterType, string[]> = {
-  [CharacterType.n]: "0123456789".split(""),
-  [CharacterType.a]: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
-  [CharacterType.c]: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
+// Use by random string generation
+const charByCharacterType: Record<CharacterType, string> = {
+  [CharacterType.n]: "0123456789",
+  [CharacterType.a]: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  [CharacterType.c]: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  [CharacterType.e]: " ",
+};
+
+// Used by validation
+const charByCharacterRE: Record<CharacterType, RegExp> = {
+  [CharacterType.n]: /^[0-9]+$/,
+  [CharacterType.a]: /^[A-Z]+$/,
+  [CharacterType.c]: /^[0-9A-Za-z]+$/,
+  [CharacterType.e]: /^ +$/,
 };
 
 export class BbanStructurePart {
@@ -37,14 +55,18 @@ export class BbanStructurePart {
   private characterType: CharacterType;
   private length: number;
 
+  validateValue?(value: string, bban: string, structure: BbanStructure): void;
+
   private constructor(
     entryType: PartType,
     characterType: CharacterType,
     length: number,
+    validate?: (value: string, bban: string, structure: BbanStructure) => void,
   ) {
     this.entryType = entryType;
     this.characterType = characterType;
     this.length = length;
+    this.validateValue = validate;
   }
 
   static bankCode(
@@ -75,11 +97,13 @@ export class BbanStructurePart {
   static nationalCheckDigit(
     length: number,
     characterType: CharacterType,
+    validate?: (value: string, bban: string, structure: BbanStructure) => void,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.NATIONAL_CHECK_DIGIT,
       characterType,
       length,
+      validate,
     );
   }
 
@@ -88,6 +112,13 @@ export class BbanStructurePart {
     characterType: CharacterType,
   ): BbanStructurePart {
     return new BbanStructurePart(PartType.ACCOUNT_TYPE, characterType, length);
+  }
+
+  static currencyType(
+    length: number,
+    characterType: CharacterType,
+  ): BbanStructurePart {
+    return new BbanStructurePart(PartType.CURRENCY_TYPE, characterType, length);
   }
 
   static ownerAccountNumber(
@@ -125,12 +156,9 @@ export class BbanStructurePart {
   }
 
   getRandom(): string {
-    const charChoices: string[] = charByCharacterType[this.characterType];
+    const charChoices = charByCharacterType[this.characterType];
 
     let s: string[] = [];
-    const randInt = (maxVal: number, minVal: number = 0) =>
-      Math.floor(Math.random() * maxVal) + minVal;
-
     for (let i = 0; i < this.getLength(); i += 1) {
       s.push(charChoices[randInt(charChoices.length)]);
     }
@@ -142,8 +170,6 @@ export class BbanStructurePart {
    *  Check to see if the string value is valid for the entry
    */
   validate(value: string): boolean {
-    const validValues = charByCharacterType[this.characterType];
-
-    return value.split("").find(v => !validValues.includes(v)) === undefined;
+    return charByCharacterRE[this.characterType].test(value);
   }
 }

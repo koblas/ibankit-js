@@ -15,6 +15,8 @@ export enum FormatViolation {
   COUNTRY_CODE_ONLY_UPPER_CASE_LETTERS,
   COUNTRY_CODE_EXISTS,
 
+  NATIONAL_CHECK_DIGIT,
+
   // IBAN Specific
   CHECK_DIGIT_TWO_DIGITS,
   CHECK_DIGIT_ONLY_DIGITS,
@@ -30,26 +32,7 @@ export enum FormatViolation {
   ACCOUNT_NUMBER_NOT_NULL,
 }
 
-export class BicFormatException extends Error {
-  formatViolation: FormatViolation;
-  actual?: string;
-  expected?: string;
-
-  constructor(
-    formatViolation: FormatViolation,
-    msg: string,
-    expected?: string,
-    actual?: string,
-  ) {
-    super(msg);
-
-    this.formatViolation = formatViolation;
-    this.expected = expected;
-    this.actual = actual;
-  }
-}
-
-export class IbanFormatException extends Error {
+export class FormatException extends Error {
   formatViolation: FormatViolation;
   actual?: string;
   expected?: string;

@@ -1,10 +1,10 @@
 import { CountryCode, countryByCode } from "./country";
 import { BbanStructure } from "./bbanStructure";
-import { PartType, CharacterType, BbanStructurePart } from "./structurePart";
+import { PartType } from "./structurePart";
 import {
   InvalidCheckDigitException,
-  IbanFormatException,
   FormatViolation,
+  FormatException,
   UnsupportedCountryException,
 } from "./exceptions";
 
@@ -60,8 +60,10 @@ export function validate(iban: string) {
     throw new Error("Internal error, expected structure");
   }
 
-  validateBbanLength(iban, structure);
-  validateBbanEntries(iban, structure);
+  structure.validate(getBban(iban));
+
+  // validateBbanLength(iban, structure);
+  // validateBbanEntries(iban, structure);
 
   validateCheckDigit(iban);
 }
@@ -182,6 +184,16 @@ export function getNationalCheckDigit(iban: string): string | null {
 }
 
 /**
+ * Returns iban's currency type
+ *
+ * @param iban String
+ * @return nationalCheckDigit String
+ */
+export function getCurrencyType(iban: string): string | null {
+  return extractBbanEntry(iban, PartType.CURRENCY_TYPE);
+}
+
+/**
  * Returns iban's account type.
  *
  * @param iban String
@@ -251,14 +263,14 @@ export function validateCheckDigit(iban: string) {
 
 function validateEmpty(iban: string) {
   if (iban == null) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.NOT_NULL,
       "Null can't be a valid Iban.",
     );
   }
 
   if (iban.length === 0) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.NOT_EMPTY,
       "Empty string can't be a valid Iban.",
     );
@@ -268,7 +280,7 @@ function validateEmpty(iban: string) {
 function validateCountryCode(iban: string) {
   // check if iban contains 2 char country code
   if (iban.length < COUNTRY_CODE_LENGTH) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.COUNTRY_CODE_TWO_LETTERS,
       "Iban must contain 2 char country code.",
       iban,
@@ -279,7 +291,7 @@ function validateCountryCode(iban: string) {
 
   // check case sensitivity
   if (countryCode !== countryCode.toUpperCase() || !ucRegex.test(countryCode)) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.COUNTRY_CODE_ONLY_UPPER_CASE_LETTERS,
       "Iban country code must contain upper case letters.",
       countryCode,
@@ -288,7 +300,7 @@ function validateCountryCode(iban: string) {
 
   const country = countryByCode(countryCode);
   if (country == null) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.COUNTRY_CODE_EXISTS,
       "Iban contains non existing country code.",
       countryCode,
@@ -308,7 +320,7 @@ function validateCountryCode(iban: string) {
 function validateCheckDigitPresence(iban: string) {
   // check if iban contains 2 digit check digit
   if (iban.length < COUNTRY_CODE_LENGTH + CHECK_DIGIT_LENGTH) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.CHECK_DIGIT_TWO_DIGITS,
       "Iban must contain 2 digit check digit.",
       iban.substring(COUNTRY_CODE_LENGTH),
@@ -319,72 +331,11 @@ function validateCheckDigitPresence(iban: string) {
 
   // check digits
   if (!numRegex.test(checkDigit)) {
-    throw new IbanFormatException(
+    throw new FormatException(
       FormatViolation.CHECK_DIGIT_ONLY_DIGITS,
       "Iban's check digit should contain only digits.",
       checkDigit,
     );
-  }
-}
-
-function validateBbanLength(iban: string, structure: BbanStructure) {
-  const expectedBbanLength = structure.getBbanLength();
-  const bban = getBban(iban);
-  const bbanLength = bban.length;
-
-  if (expectedBbanLength != bbanLength) {
-    throw new IbanFormatException(
-      FormatViolation.BBAN_LENGTH,
-      `[${bban}] length is ${bbanLength}, expected BBAN length is: ${expectedBbanLength}`,
-      String(bbanLength),
-      String(expectedBbanLength),
-    );
-  }
-}
-
-function validateBbanEntries(iban: string, structure: BbanStructure) {
-  const bban = getBban(iban);
-
-  let offset = 0;
-
-  for (let part of structure.getParts()) {
-    const partLength = part.getLength();
-    const entryValue = bban.substring(offset, offset + partLength);
-
-    offset = offset + partLength;
-
-    // validate character type
-    validateBbanEntryCharacterType(part, entryValue);
-  }
-}
-
-function validateBbanEntryCharacterType(
-  part: BbanStructurePart,
-  entryValue: string,
-) {
-  if (part.validate(entryValue)) {
-    return;
-  }
-
-  switch (part.getCharacterType()) {
-    case CharacterType.a:
-      throw new IbanFormatException(
-        FormatViolation.BBAN_ONLY_UPPER_CASE_LETTERS,
-        `[${entryValue}] must contain only upper case letters.`,
-        entryValue,
-      );
-    case CharacterType.c:
-      throw new IbanFormatException(
-        FormatViolation.BBAN_ONLY_DIGITS_OR_LETTERS,
-        `[${entryValue}] must contain only digits or letters.`,
-        entryValue,
-      );
-    case CharacterType.n:
-      throw new IbanFormatException(
-        FormatViolation.BBAN_ONLY_DIGITS,
-        `[${entryValue}] must contain only digits.`,
-        entryValue,
-      );
   }
 }
 
@@ -436,7 +387,7 @@ function calculateMod(iban: string): number {
       } else if (V0 <= code && code <= V9) {
         return addSum(total, code - V0);
       } else {
-        throw new IbanFormatException(
+        throw new FormatException(
           FormatViolation.IBAN_VALID_CHARACTERS,
           `Invalid Character[${ch}] = '${code}'`,
           ch,
@@ -471,21 +422,5 @@ function extractBbanEntry(iban: string, partType: PartType): string | null {
     return null;
   }
 
-  let bbanPartOffset = 0;
-  let result = null;
-
-  for (let part of structure.getParts()) {
-    const partLength = part.getLength();
-    const partValue = bban.substring(
-      bbanPartOffset,
-      bbanPartOffset + partLength,
-    );
-
-    bbanPartOffset = bbanPartOffset + partLength;
-    if (part.getPartType() == partType) {
-      result = (result || "") + partValue;
-    }
-  }
-
-  return result;
+  return structure.extractValue(bban, partType);
 }

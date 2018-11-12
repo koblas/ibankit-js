@@ -1,5 +1,45 @@
-import { CharacterType, BbanStructurePart } from "./structurePart";
+import { CharacterType, BbanStructurePart, PartType } from "./structurePart";
 import { CountryCode } from "./country";
+import { FormatException, FormatViolation } from "./exceptions";
+
+/**
+ * MOD11 check digit computation
+ */
+function mod11(value: string, weights: number[]) {
+  return (
+    11 -
+    (value
+      .split("")
+      .reverse()
+      .reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx], 0) %
+      11)
+  );
+}
+
+/*
+ ** Return a function that is a MOD11 national check digit checker
+ */
+function nationalFactory(weights: number[]) {
+  return (checkdigit: string, bban: string, structure: BbanStructure) => {
+    const accountNumber = structure.extractValue(bban, PartType.ACCOUNT_NUMBER);
+
+    if (accountNumber === null) {
+      throw new FormatException(FormatViolation.NOT_EMPTY, "account number");
+    }
+
+    const actual = structure.extractValue(bban, PartType.NATIONAL_CHECK_DIGIT);
+    const digit = mod11(accountNumber, weights);
+
+    if (actual !== String(digit)) {
+      throw new FormatException(
+        FormatViolation.NATIONAL_CHECK_DIGIT,
+        `national check digit(s) don't match expect=[${digit}] actual=[${actual}]`,
+        String(digit),
+        String(actual),
+      );
+    }
+  };
+}
 
 /**
  * Class which represents bban structure
@@ -27,6 +67,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
+    // Provisional
     [CountryCode.AO]: new BbanStructure(
       BbanStructurePart.accountNumber(21, CharacterType.n),
     ),
@@ -54,6 +95,7 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.BF]: new BbanStructure(
       BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
@@ -70,10 +112,12 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(14, CharacterType.c),
     ),
 
+    // Provisional
     [CountryCode.BI]: new BbanStructure(
       BbanStructurePart.accountNumber(12, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.BJ]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.c),
       BbanStructurePart.branchCode(5, CharacterType.n),
@@ -95,11 +139,23 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
+    // Provisional
+    [CountryCode.CG]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
+    ),
+
+    [CountryCode.CH]: new BbanStructure(
+      BbanStructurePart.bankCode(5, CharacterType.n),
+      BbanStructurePart.accountNumber(12, CharacterType.c),
+    ),
+
+    // Provisional
     [CountryCode.CI]: new BbanStructure(
       BbanStructurePart.bankCode(2, CharacterType.c),
       BbanStructurePart.accountNumber(22, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.CM]: new BbanStructure(
       BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
@@ -109,6 +165,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(14, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.CV]: new BbanStructure(
       BbanStructurePart.accountNumber(21, CharacterType.n),
     ),
@@ -117,11 +174,6 @@ export class BbanStructure {
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.c),
-    ),
-
-    [CountryCode.CH]: new BbanStructure(
-      BbanStructurePart.bankCode(5, CharacterType.n),
-      BbanStructurePart.accountNumber(12, CharacterType.c),
     ),
 
     [CountryCode.CZ]: new BbanStructure(
@@ -144,6 +196,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(20, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.DZ]: new BbanStructure(
       BbanStructurePart.accountNumber(20, CharacterType.n),
     ),
@@ -153,6 +206,11 @@ export class BbanStructure {
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.n),
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.EG]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
 
     [CountryCode.ES]: new BbanStructure(
@@ -181,6 +239,17 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
+    // Provisional
+    [CountryCode.GA]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
+    ),
+
+    [CountryCode.GB]: new BbanStructure(
+      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.branchCode(6, CharacterType.n),
+      BbanStructurePart.accountNumber(8, CharacterType.n),
+    ),
+
     [CountryCode.GE]: new BbanStructure(
       BbanStructurePart.bankCode(2, CharacterType.a),
       BbanStructurePart.accountNumber(16, CharacterType.n),
@@ -189,12 +258,6 @@ export class BbanStructure {
     [CountryCode.GI]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.accountNumber(15, CharacterType.c),
-    ),
-
-    [CountryCode.GB]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.a),
-      BbanStructurePart.branchCode(6, CharacterType.n),
-      BbanStructurePart.accountNumber(8, CharacterType.n),
     ),
 
     [CountryCode.GL]: new BbanStructure(
@@ -210,12 +273,20 @@ export class BbanStructure {
 
     [CountryCode.GT]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.c),
-      BbanStructurePart.accountNumber(20, CharacterType.c),
+      BbanStructurePart.currencyType(2, CharacterType.n),
+      BbanStructurePart.accountType(2, CharacterType.n),
+      BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
     [CountryCode.HR]: new BbanStructure(
       BbanStructurePart.bankCode(7, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.HN]: new BbanStructure(
+      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.accountNumber(20, CharacterType.n),
     ),
 
     [CountryCode.HU]: new BbanStructure(
@@ -243,6 +314,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(12, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.IR]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(19, CharacterType.n),
@@ -266,6 +338,11 @@ export class BbanStructure {
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.branchCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(18, CharacterType.c),
+    ),
+
+    // Provisional
+    [CountryCode.KM]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
 
     [CountryCode.KW]: new BbanStructure(
@@ -308,6 +385,11 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(13, CharacterType.c),
     ),
 
+    // Provisional
+    [CountryCode.MA]: new BbanStructure(
+      BbanStructurePart.accountNumber(24, CharacterType.n),
+    ),
+
     [CountryCode.MC]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
@@ -326,6 +408,7 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.MG]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
@@ -339,6 +422,7 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
+    // Provisional
     [CountryCode.ML]: new BbanStructure(
       BbanStructurePart.bankCode(1, CharacterType.a),
       BbanStructurePart.accountNumber(23, CharacterType.n),
@@ -363,8 +447,21 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(18, CharacterType.c),
     ),
 
+    // Provisional
     [CountryCode.MZ]: new BbanStructure(
       BbanStructurePart.accountNumber(21, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.NE]: new BbanStructure(
+      BbanStructurePart.bankCode(2, CharacterType.a),
+      BbanStructurePart.accountNumber(22, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.NI]: new BbanStructure(
+      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.accountNumber(24, CharacterType.n),
     ),
 
     [CountryCode.NL]: new BbanStructure(
@@ -375,7 +472,11 @@ export class BbanStructure {
     [CountryCode.NO]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(6, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(
+        1,
+        CharacterType.n,
+        nationalFactory([5, 4, 3, 2, 7, 6, 5, 4, 3, 2]),
+      ),
     ),
 
     [CountryCode.PK]: new BbanStructure(
@@ -427,7 +528,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.branchCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.n),
-      BbanStructurePart.accountNumber(3, CharacterType.a),
+      BbanStructurePart.currencyType(3, CharacterType.a),
     ),
 
     [CountryCode.SE]: new BbanStructure(
@@ -454,6 +555,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(12, CharacterType.c),
     ),
 
+    // Provisional
     [CountryCode.SN]: new BbanStructure(
       BbanStructurePart.bankCode(1, CharacterType.a),
       BbanStructurePart.accountNumber(23, CharacterType.n),
@@ -469,6 +571,17 @@ export class BbanStructure {
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.branchCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.TG]: new BbanStructure(
+      BbanStructurePart.bankCode(2, CharacterType.a),
+      BbanStructurePart.accountNumber(22, CharacterType.n),
+    ),
+
+    // Provisional
+    [CountryCode.TD]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
 
     [CountryCode.TL]: new BbanStructure(
@@ -494,6 +607,11 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(19, CharacterType.n),
     ),
 
+    [CountryCode.VA]: new BbanStructure(
+      BbanStructurePart.bankCode(3, CharacterType.c),
+      BbanStructurePart.accountNumber(15, CharacterType.n),
+    ),
+
     [CountryCode.VG]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.c),
       BbanStructurePart.accountNumber(16, CharacterType.n),
@@ -514,6 +632,31 @@ export class BbanStructure {
 
   getParts(): BbanStructurePart[] {
     return this.entries;
+  }
+
+  validate(bban: string) {
+    this.validateBbanLength(bban);
+    this.validateBbanEntries(bban);
+  }
+
+  extractValue(bban: string, partType: PartType): string | null {
+    let bbanPartOffset = 0;
+    let result = null;
+
+    for (let part of this.getParts()) {
+      const partLength = part.getLength();
+      const partValue = bban.substring(
+        bbanPartOffset,
+        bbanPartOffset + partLength,
+      );
+
+      bbanPartOffset = bbanPartOffset + partLength;
+      if (part.getPartType() == partType) {
+        result = (result || "") + partValue;
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -544,5 +687,68 @@ export class BbanStructure {
    */
   public getBbanLength(): number {
     return this.entries.reduce((acc, e) => acc + e.getLength(), 0);
+  }
+
+  private validateBbanLength(bban: string) {
+    const expectedBbanLength = this.getBbanLength();
+    const bbanLength = bban.length;
+
+    if (expectedBbanLength != bbanLength) {
+      throw new FormatException(
+        FormatViolation.BBAN_LENGTH,
+        `[${bban}] length is ${bbanLength}, expected BBAN length is: ${expectedBbanLength}`,
+        String(bbanLength),
+        String(expectedBbanLength),
+      );
+    }
+  }
+
+  private validateBbanEntries(bban: string) {
+    let offset = 0;
+
+    for (let part of this.getParts()) {
+      const partLength = part.getLength();
+      const entryValue = bban.substring(offset, offset + partLength);
+
+      offset = offset + partLength;
+
+      // validate character type
+      this.validateBbanEntryCharacterType(bban, part, entryValue);
+    }
+  }
+
+  private validateBbanEntryCharacterType(
+    bban: string,
+    part: BbanStructurePart,
+    entryValue: string,
+  ) {
+    if (part.validate(entryValue)) {
+      if (part.validateValue) {
+        part.validateValue(entryValue, bban, this);
+      }
+
+      return;
+    }
+
+    switch (part.getCharacterType()) {
+      case CharacterType.a:
+        throw new FormatException(
+          FormatViolation.BBAN_ONLY_UPPER_CASE_LETTERS,
+          `[${entryValue}] must contain only upper case letters.`,
+          entryValue,
+        );
+      case CharacterType.c:
+        throw new FormatException(
+          FormatViolation.BBAN_ONLY_DIGITS_OR_LETTERS,
+          `[${entryValue}] must contain only digits or letters.`,
+          entryValue,
+        );
+      case CharacterType.n:
+        throw new FormatException(
+          FormatViolation.BBAN_ONLY_DIGITS,
+          `[${entryValue}] must contain only digits.`,
+          entryValue,
+        );
+    }
   }
 }

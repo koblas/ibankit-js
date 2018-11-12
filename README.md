@@ -6,7 +6,16 @@
 
 A library for generation and validation of the International Bank Account Numbers (<a href="http://en.wikipedia.org/wiki/ISO_13616" target="_blank">IBAN ISO_13616</a>) and Business Identifier Codes (<a href="http://en.wikipedia.org/wiki/ISO_9362" target="_blank">BIC ISO_9362</a>).
 
-This library provides full TypesScript support
+#### Key Features
+
+- Drop in replacable with iban-js
+- Currently conformant with Version 80 of the IBAN registry
+- Decodes bank, branch and account numbers from IBAN
+- Supports random BBAN / IBAN generation for testing
+- Has BIC validation as a bonus
+- Supports validation of National Check Digits if in BBAN format
+- This library provides full TypesScript support
+- No external dependancies
 
 #### Iban quick examples:
 
@@ -53,7 +62,9 @@ BIC.isValid("DEUTDEFF500"); // === true
 
 - http://en.wikipedia.org/wiki/ISO_13616
 - http://en.wikipedia.org/wiki/ISO_9362
-- https://www.ecb.europa.eu/paym/retpaym/paymint/sepa/shared/pdf/iban_registry.pdf
+- https://www.swift.com/resource/iban-registry-pdf
+- https://docs.oracle.com/cd/E18727_01/doc.121/e13483/T359831T498954.htm
+- https://en.bitcoinwiki.org/wiki/International_Bank_Account_Number
 
 #### Credits
 
