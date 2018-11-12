@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Run build
-          command: npm build
+          command: npm run build
 
       - save_cache:
           paths:
