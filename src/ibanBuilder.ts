@@ -6,7 +6,7 @@ import { randInt } from "./randInt";
 import {
   UnsupportedCountryException,
   FormatViolation,
-  IbanFormatException,
+  FormatException,
 } from "./exceptions";
 import { IBAN } from "./iban";
 
@@ -152,7 +152,7 @@ export class IBANBuilder {
    * Builds random iban instance.
    *
    * @return random iban instance.
-   * @exception IbanFormatException if values are not parsable by Iban Specification
+   * @exception FormatException if values are not parsable by Iban Specification
    *  <a href="http://en.wikipedia.org/wiki/ISO_13616">ISO_13616</a>
    * @exception UnsupportedCountryException if country is not supported
    *
@@ -227,21 +227,21 @@ export class IBANBuilder {
     accountNumber: string | undefined,
   ) {
     if (countryCode == null) {
-      throw new IbanFormatException(
+      throw new FormatException(
         FormatViolation.COUNTRY_CODE_NOT_NULL,
         "countryCode is required; it cannot be null",
       );
     }
 
     if (bankCode == null) {
-      throw new IbanFormatException(
+      throw new FormatException(
         FormatViolation.BANK_CODE_NOT_NULL,
         "bankCode is required; it cannot be null",
       );
     }
 
     if (accountNumber == null) {
-      throw new IbanFormatException(
+      throw new FormatException(
         FormatViolation.ACCOUNT_NUMBER_NOT_NULL,
         "accountNumber is required; it cannot be null",
       );
