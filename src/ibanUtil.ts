@@ -349,22 +349,6 @@ function validateCheckDigitPresence(iban: string) {
 function calculateMod(iban: string): number {
   const reformattedIban = getBban(iban) + getCountryCodeAndCheckDigit(iban);
 
-  /*
-            function iso13616Prepare(iban) {
-        iban = iban.toUpperCase();
-        iban = iban.substr(4) + iban.substr(0,4);
-
-        return iban.split('').map(function(n){
-            var code = n.charCodeAt(0);
-            if (code >= A && code <= Z){
-                // A = 10, B = 11, ... Z = 35
-                return code - A + 10;
-            } else {
-                return n;
-            }
-        }).join('');
-    }*/
-
   const VA = "A".charCodeAt(0);
   const VZ = "Z".charCodeAt(0);
   const V0 = "0".charCodeAt(0);

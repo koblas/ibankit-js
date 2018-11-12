@@ -21,25 +21,26 @@ A library for generation and validation of the International Bank Account Number
 
 ```javascript
 // How to generate Iban
-const iban = new IbanBuilder()
+const ibanStr = new IBANBuilder()
   .countryCode(CountryCode.AT)
   .bankCode("19043")
   .accountNumber("00234573201")
-  .build();
+  .build()
+  .toString();
 
 // How to create Iban object from String
 const iban = new IBAN("DE89370400440532013000");
 
 // The library ignores spaces in IBANs, this is valid
-const iban = IBAN("DE89 3704 0044 0532 0130 00");
+const iban = new IBAN("DE89 3704 0044 0532 0130 00");
 
 // For testing, the library will also generate random IBANs
-const iban = IBAn.random(CountryCode.AT);
+const iban = IBAN.random(CountryCode.AT);
 const iban = IBAN.random();
-const iban = new IBAN.Builder()
+const iban = new IBANBuilder()
   .countryCode(CountryCode.AT)
   .bankCode("19043")
-  .buildRandom();
+  .build();
 
 // For simplicity in porting from iban-js applications
 // you can quickly check validity

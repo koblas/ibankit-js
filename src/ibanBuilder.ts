@@ -126,13 +126,19 @@ export class IBANBuilder {
    *  <a href="http://en.wikipedia.org/wiki/ISO_13616">ISO_13616</a>
    * @exception UnsupportedCountryException if country is not supported
    */
-  build(validate: boolean = true): IBAN {
-    // null checks
-    this.require(
-      this.countryCodeValue,
-      this.bankCodeValue,
-      this.accountNumberValue,
-    );
+  build(fillRandom: boolean = true, validate: boolean = true): IBAN {
+    if (fillRandom && this.countryCodeValue == null) {
+      const countryCodes = BbanStructure.supportedCountries();
+
+      this.countryCodeValue = countryCodes[randInt(countryCodes.length)];
+    }
+
+    const structure = BbanStructure.forCountry(this.countryCodeValue);
+    if (structure === null) {
+      throw new Error("shouldn't happen");
+    }
+
+    this.fillMissingFieldsRandomly(fillRandom);
 
     // iban is formatted with default check digit.
     const formattedIban = this.formatIban();
@@ -146,27 +152,6 @@ export class IBANBuilder {
       ibanUtil.validate(ibanValue);
     }
     return new IBAN(ibanValue);
-  }
-
-  /**
-   * Builds random iban instance.
-   *
-   * @return random iban instance.
-   * @exception FormatException if values are not parsable by Iban Specification
-   *  <a href="http://en.wikipedia.org/wiki/ISO_13616">ISO_13616</a>
-   * @exception UnsupportedCountryException if country is not supported
-   *
-   */
-  public buildRandom(): IBAN {
-    if (this.countryCodeValue == null) {
-      const countryCodes = BbanStructure.supportedCountries();
-
-      this.countryCodeValue = countryCodes[randInt(countryCodes.length)];
-    }
-
-    this.fillMissingFieldsRandomly();
-
-    return this.build();
   }
 
   /**
@@ -209,7 +194,7 @@ export class IBANBuilder {
       }
     }
 
-    return parts.join();
+    return parts.join("");
   }
 
   /**
@@ -221,34 +206,7 @@ export class IBANBuilder {
     }${this.formatBban()}`;
   }
 
-  private require(
-    countryCode: CountryCode | undefined,
-    bankCode: string | undefined,
-    accountNumber: string | undefined,
-  ) {
-    if (countryCode == null) {
-      throw new FormatException(
-        FormatViolation.COUNTRY_CODE_NOT_NULL,
-        "countryCode is required; it cannot be null",
-      );
-    }
-
-    if (bankCode == null) {
-      throw new FormatException(
-        FormatViolation.BANK_CODE_NOT_NULL,
-        "bankCode is required; it cannot be null",
-      );
-    }
-
-    if (accountNumber == null) {
-      throw new FormatException(
-        FormatViolation.ACCOUNT_NUMBER_NOT_NULL,
-        "accountNumber is required; it cannot be null",
-      );
-    }
-  }
-
-  private fillMissingFieldsRandomly() {
+  private fillMissingFieldsRandomly(fillRandom: boolean) {
     const structure = BbanStructure.forCountry(this.countryCodeValue);
 
     if (structure == null) {
@@ -265,16 +223,31 @@ export class IBANBuilder {
         case PartType.BANK_CODE:
           if (!this.bankCodeValue) {
             this.bankCodeValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "bankCode is required; it cannot be null",
+            );
           }
           break;
         case PartType.BRANCH_CODE:
           if (!this.branchCodeValue) {
             this.branchCodeValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "branchCode is required; it cannot be null",
+            );
           }
           break;
         case PartType.ACCOUNT_NUMBER:
           if (!this.accountNumberValue) {
             this.accountNumberValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "accountNumber is required; it cannot be null",
+            );
           }
           break;
         case PartType.NATIONAL_CHECK_DIGIT:
@@ -286,16 +259,31 @@ export class IBANBuilder {
         case PartType.ACCOUNT_TYPE:
           if (!this.accountTypeValue) {
             this.accountTypeValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "accountType is required; it cannot be null",
+            );
           }
           break;
         case PartType.OWNER_ACCOUNT_NUMBER:
           if (!this.ownerAccountTypeValue) {
             this.ownerAccountTypeValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "ownerAccountType is required; it cannot be null",
+            );
           }
           break;
         case PartType.IDENTIFICATION_NUMBER:
           if (!this.identificationNumberValue) {
             this.identificationNumberValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "indentificationNumber is required; it cannot be null",
+            );
           }
           break;
       }

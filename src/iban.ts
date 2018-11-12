@@ -169,8 +169,8 @@ export class IBAN {
 
   static random(cc?: CountryCode): IBAN {
     if (cc !== undefined) {
-      return new IBANBuilder().countryCode(cc).buildRandom();
+      return new IBANBuilder().countryCode(cc).build();
     }
-    return new IBANBuilder().buildRandom();
+    return new IBANBuilder().build();
   }
 }
