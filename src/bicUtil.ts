@@ -1,6 +1,6 @@
 import {
   UnsupportedCountryException,
-  BicFormatException,
+  FormatException,
   FormatViolation,
 } from "./exceptions";
 import { countryByCode } from "./country";
@@ -24,7 +24,7 @@ const ucnumRegex = /^[A-Z0-9]+$/;
  * Validates bic.
  *
  * @param bic to be validated.
- * @throws BicFormatException if bic is invalid.
+ * @throws FormatException if bic is invalid.
  *         UnsupportedCountryException if bic's country is not supported.
  */
 export function validate(bic: string) {
@@ -42,14 +42,14 @@ export function validate(bic: string) {
 
 function validateEmpty(bic: string) {
   if (bic == null) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.NOT_NULL,
       "Null can't be a valid Bic.",
     );
   }
 
   if (bic.length === 0) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.NOT_EMPTY,
       "Empty string can't be a valid Bic.",
     );
@@ -58,7 +58,7 @@ function validateEmpty(bic: string) {
 
 function validateLength(bic: string) {
   if (bic.length !== BIC8_LENGTH && bic.length !== BIC11_LENGTH) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.BIC_LENGTH_8_OR_11,
       `Bic length must be ${BIC8_LENGTH} or ${BIC11_LENGTH}`,
     );
@@ -67,7 +67,7 @@ function validateLength(bic: string) {
 
 function validateCase(bic: string) {
   if (bic !== bic.toUpperCase()) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.BIC_ONLY_UPPER_CASE_LETTERS,
       "Bic must contain only upper case letters.",
     );
@@ -78,7 +78,7 @@ function validateBankCode(bic: string) {
   const bankCode = getBankCode(bic);
 
   if (!ucRegex.test(bankCode)) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.BANK_CODE_ONLY_LETTERS,
       "Bank code must contain only letters.",
       bankCode,
@@ -94,7 +94,7 @@ function validateCountryCode(bic: string) {
     countryCode !== countryCode.toUpperCase() ||
     !ucRegex.test(countryCode)
   ) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.COUNTRY_CODE_ONLY_UPPER_CASE_LETTERS,
       "Bic country code must contain upper case letters",
       countryCode,
@@ -113,7 +113,7 @@ function validateLocationCode(bic: string) {
   const locationCode = getLocationCode(bic);
 
   if (!ucnumRegex.test(locationCode)) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.LOCATION_CODE_ONLY_LETTERS_OR_DIGITS,
       "Location code must contain only letters or digits.",
       locationCode,
@@ -125,7 +125,7 @@ function validateBranchCode(bic: string) {
   const branchCode = getBranchCode(bic);
 
   if (!ucnumRegex.test(branchCode)) {
-    throw new BicFormatException(
+    throw new FormatException(
       FormatViolation.BRANCH_CODE_ONLY_LETTERS_OR_DIGITS,
       "Branch code must contain only letters or digits.",
       branchCode,
