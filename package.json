@@ -1,7 +1,7 @@
 {
   "name": "ibankit",
-  "version": "0.1.2",
-  "description": "IBAN utilities",
+  "version": "1.0.0",
+  "description": "IBAN and BIC utilities",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [

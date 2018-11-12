@@ -13,7 +13,7 @@ A library for generation and validation of the International Bank Account Number
 - Decodes bank, branch and account numbers from IBAN
 - Supports random BBAN / IBAN generation for testing
 - Has BIC validation as a bonus
-- Supports validation of National Check Digits if in BBAN format
+- Supports validation of National Check Digits if part of BBAN format
 - This library provides full TypesScript support
 - No external dependancies
 
@@ -57,6 +57,11 @@ const bic = BIC("DEUTDEFF");
 // Check to see is BIC code is valid
 BIC.isValid("DEUTDEFF500"); // === true
 ```
+
+### TODO
+
+[ ] For random IBANs the National Check digits is random, rather than "valid"
+[ ] Finish writing all national check digit validators (see Oracle spec)
 
 #### References
 

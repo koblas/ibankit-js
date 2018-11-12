@@ -525,10 +525,14 @@ export function countryByCode(code: string): CountryCode | null {
     return null;
   }
 
+  let info;
   if (code.length === 3) {
-    return by3code[code][0];
+    info = by3code[code];
   } else if (code.length === 2) {
-    return by2code[code][0];
+    info = by2code[code];
+  }
+  if (info) {
+    return info[0];
   }
 
   return null;
