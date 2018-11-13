@@ -147,7 +147,7 @@ function nationalNO(bban: string, structure: BbanStructure) {
     .map(p => structure.extractValueMust(bban, p))
     .join("");
 
-  return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]));
+  return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]) % 10);
 }
 
 // ISO 7064 MOD 10
