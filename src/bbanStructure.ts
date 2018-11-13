@@ -14,10 +14,178 @@ function mod11(value: string, weights: number[]) {
     (11 -
       (value
         .split("")
-        .reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx], 0) %
+        .reduce(
+          (acc, s, idx) =>
+            acc + parseInt(s, 10) * weights[idx % weights.length],
+          0,
+        ) %
         11)) %
     11
   );
+}
+
+function nationalES(bban: string, structure: BbanStructure) {
+  const weights = [1, 2, 4, 8, 5, 10, 9, 7, 3, 6];
+  const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE]
+    .map(p => structure.extractValueMust(bban, p))
+    .join("");
+  const d1 = mod11(`00${combined}`, weights);
+  const d2 = mod11(
+    structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER),
+    weights,
+  );
+
+  return `${d1}${d2}`;
+}
+
+/**
+ * France Checksum (shared)
+ */
+function nationalFR(bban: string, structure: BbanStructure) {
+  const replaceChars = {
+    ["[AJ]"]: "1",
+    ["[BKS]"]: "2",
+    ["[CLT]"]: "3",
+    ["[DMU]"]: "4",
+    ["[ENV]"]: "5",
+    ["[FOW]"]: "6",
+    ["[GPX]"]: "7",
+    ["[HQY]"]: "8",
+    ["[IRZ]"]: "9",
+  };
+  let combined =
+    [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
+      .map(p => String(structure.extractValue(bban, p)))
+      .join("") + "00";
+  Object.entries(replaceChars).map(
+    ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
+  );
+
+  // Number is bigger than max integer, take the mod%97 by hand
+  const expected =
+    97 -
+    combined.split("").reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
+
+  return String(expected).padStart(2, "0");
+}
+
+function nationalIT(bban: string, structure: BbanStructure) {
+  const even = [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+  ];
+  const odd = [
+    1,
+    0,
+    5,
+    7,
+    9,
+    13,
+    15,
+    17,
+    19,
+    21,
+    2,
+    4,
+    18,
+    20,
+    11,
+    3,
+    6,
+    8,
+    12,
+    14,
+    16,
+    10,
+    22,
+    25,
+    24,
+    23,
+  ];
+  const V0 = "0".charCodeAt(0);
+  const V9 = "9".charCodeAt(0);
+  const VA = "A".charCodeAt(0);
+  const value =
+    [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
+      .map(p => structure.extractValueMust(bban, p))
+      .join("")
+      .split("")
+      .map(v => v.toUpperCase().charCodeAt(0))
+      .map(v => v - (V0 <= v && v <= V9 ? V0 : VA))
+      .reduce((acc, v, idx) => acc + (idx % 2 === 0 ? odd[v] : even[v]), 0) %
+    26;
+
+  return String.fromCharCode(VA + value);
+}
+
+function nationalNO(bban: string, structure: BbanStructure) {
+  const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER]
+    .map(p => structure.extractValueMust(bban, p))
+    .join("");
+
+  return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]));
+}
+
+// ISO 7064 MOD 10
+function nationalPT(bban: string, structure: BbanStructure) {
+  const V0 = "0".charCodeAt(0);
+  const weights = [
+    73,
+    17,
+    89,
+    38,
+    62,
+    45,
+    53,
+    15,
+    50,
+    5,
+    49,
+    34,
+    81,
+    76,
+    27,
+    90,
+    9,
+    30,
+    3,
+  ];
+  const remainder = [
+    PartType.BANK_CODE,
+    PartType.BRANCH_CODE,
+    PartType.ACCOUNT_NUMBER,
+  ]
+    .map(p => structure.extractValueMust(bban, p))
+    .join("")
+    .split("")
+    .map(v => v.charCodeAt(0))
+    .reduce((acc, v, idx) => (acc + (v - V0) * weights[idx]) % 97, 0);
+
+  return String(98 - remainder);
 }
 
 /**
@@ -27,6 +195,13 @@ function mod11(value: string, weights: number[]) {
  *    https://www.mobilefish.com/services/bban_iban/bban_iban.php
  */
 export class BbanStructure {
+  private static bbanFR = new BbanStructure(
+    BbanStructurePart.bankCode(5, CharacterType.n),
+    BbanStructurePart.branchCode(5, CharacterType.n),
+    BbanStructurePart.accountNumber(11, CharacterType.c),
+    BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
+  );
+
   static structures: { [key in CountryCode]?: BbanStructure } = {
     [CountryCode.AD]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
@@ -147,8 +322,15 @@ export class BbanStructure {
     ),
 
     // Provisional
+    [CountryCode.CF]: new BbanStructure(
+      BbanStructurePart.accountNumber(23, CharacterType.n),
+      // @TODO is this france?
+    ),
+
+    // Provisional
     [CountryCode.CG]: new BbanStructure(
       BbanStructurePart.accountNumber(23, CharacterType.n),
+      // @TODO is this france?
     ),
 
     [CountryCode.CH]: new BbanStructure(
@@ -193,6 +375,9 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
+    // Provisional
+    [CountryCode.DJ]: BbanStructure.bbanFR,
+
     [CountryCode.DK]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
@@ -216,14 +401,12 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.EG]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-    ),
+    [CountryCode.EG]: BbanStructure.bbanFR,
 
     [CountryCode.ES]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalES),
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
@@ -239,49 +422,10 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
     ),
 
-    [CountryCode.FR]: new BbanStructure(
-      BbanStructurePart.bankCode(5, CharacterType.n),
-      BbanStructurePart.branchCode(5, CharacterType.n),
-      BbanStructurePart.accountNumber(11, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(
-        2,
-        CharacterType.n,
-        (bban: string, structure: BbanStructure) => {
-          const replaceChars = {
-            ["[AJ]"]: "1",
-            ["[BKS]"]: "2",
-            ["[CLT]"]: "3",
-            ["[DMU]"]: "4",
-            ["[ENV]"]: "5",
-            ["[FOW]"]: "6",
-            ["[GPX]"]: "7",
-            ["[HQY]"]: "8",
-            ["[IRZ]"]: "9",
-          };
-          let combined =
-            [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
-              .map(p => String(structure.extractValue(bban, p)))
-              .join("") + "00";
-          Object.entries(replaceChars).map(
-            ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
-          );
-
-          // Number is bigger than max integer, take the mod%97 by hand
-          const expected =
-            97 -
-            combined
-              .split("")
-              .reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
-
-          return String(expected).padStart(2, "0");
-        },
-      ),
-    ),
+    [CountryCode.FR]: BbanStructure.bbanFR,
 
     // Provisional
-    [CountryCode.GA]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-    ),
+    [CountryCode.GA]: BbanStructure.bbanFR,
 
     [CountryCode.GB]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -303,6 +447,9 @@ export class BbanStructure {
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
+
+    // Provisional
+    [CountryCode.GQ]: BbanStructure.bbanFR,
 
     [CountryCode.GR]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
@@ -367,7 +514,7 @@ export class BbanStructure {
     ),
 
     [CountryCode.IT]: new BbanStructure(
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.a),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.a, nationalIT),
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(12, CharacterType.c),
@@ -433,7 +580,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     [CountryCode.MD]: new BbanStructure(
@@ -445,6 +592,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(13, CharacterType.n),
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      // @TODO checkdigit
     ),
 
     // Provisional
@@ -459,6 +607,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.c),
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      // @TODO checkdigit
     ),
 
     // Provisional
@@ -511,17 +660,7 @@ export class BbanStructure {
     [CountryCode.NO]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(6, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(
-        1,
-        CharacterType.n,
-        (bban: string, structure: BbanStructure) => {
-          const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER]
-            .map(p => structure.extractValueMust(bban, p))
-            .join("");
-
-          return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]));
-        },
-      ),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalNO),
     ),
 
     [CountryCode.PK]: new BbanStructure(
@@ -545,7 +684,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalPT),
     ),
 
     [CountryCode.QA]: new BbanStructure(
@@ -594,7 +733,7 @@ export class BbanStructure {
     ),
 
     [CountryCode.SM]: new BbanStructure(
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.a),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.a, nationalIT),
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(12, CharacterType.c),
@@ -627,6 +766,7 @@ export class BbanStructure {
     // Provisional
     [CountryCode.TD]: new BbanStructure(
       BbanStructurePart.accountNumber(23, CharacterType.n),
+      // @TODO is this france?
     ),
 
     [CountryCode.TL]: new BbanStructure(

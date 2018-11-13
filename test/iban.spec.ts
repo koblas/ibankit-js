@@ -484,6 +484,7 @@ describe("IBAN", () => {
 
     it("PT", () => {
       const iban = new IBAN("PT50000201231234567890154");
+
       expect(iban.getCountryCode()).toBe("PT");
       expect(iban.getBankCode()).toBe("0002");
       expect(iban.getBranchCode()).toBe("0123");
@@ -651,6 +652,11 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("BJ");
     });
 
+    it("CF", () => {
+      const iban = new IBAN("CF4220001000010120069700160");
+      expect(iban.getCountryCode()).toBe("CF");
+    });
+
     it("CI", () => {
       const iban = new IBAN("CI93CI0080111301134291200589");
       expect(iban.getCountryCode()).toBe("CI");
@@ -666,9 +672,19 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("CV");
     });
 
+    it("DJ", () => {
+      const iban = new IBAN("DJ2110002010010409943020008");
+      expect(iban.getCountryCode()).toBe("DJ");
+    });
+
     it("DZ", () => {
       const iban = new IBAN("DZ8612345678901234567890");
       expect(iban.getCountryCode()).toBe("DZ");
+    });
+
+    it("GQ", () => {
+      const iban = new IBAN("GQ7050002001003715228190196");
+      expect(iban.getCountryCode()).toBe("GQ");
     });
 
     it("HN", () => {

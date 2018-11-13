@@ -71,6 +71,7 @@ BIC.isValid("DEUTDEFF500"); // === true
 - https://www.swift.com/resource/iban-registry-pdf
 - https://docs.oracle.com/cd/E18727_01/doc.121/e13483/T359831T498954.htm
 - https://en.bitcoinwiki.org/wiki/International_Bank_Account_Number
+- https://github.com/globalcitizen/php-iban/issues/39
 
 #### Credits
 
