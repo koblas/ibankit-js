@@ -1,34 +1,23 @@
 import { CharacterType, BbanStructurePart, PartType } from "./structurePart";
 import { CountryCode } from "./country";
-import { FormatException, FormatViolation } from "./exceptions";
+import {
+  FormatException,
+  FormatViolation,
+  RequiredPartTypeMissing,
+} from "./exceptions";
 
 /**
  * MOD11 check digit computation
  */
 function mod11(value: string, weights: number[]) {
   return (
-    11 -
-    (value
-      .split("")
-      .reverse()
-      .reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx], 0) %
-      11)
+    (11 -
+      (value
+        .split("")
+        .reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx], 0) %
+        11)) %
+    11
   );
-}
-
-/*
- ** Return a function that is a MOD11 national check digit checker
- */
-function nationalFactory(weights: number[]) {
-  return (bban: string, structure: BbanStructure) => {
-    const accountNumber = structure.extractValue(bban, PartType.ACCOUNT_NUMBER);
-
-    if (accountNumber === null) {
-      throw new FormatException(FormatViolation.NOT_EMPTY, "account number");
-    }
-
-    return String(mod11(accountNumber, weights));
-  };
 }
 
 /**
@@ -525,7 +514,13 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(
         1,
         CharacterType.n,
-        nationalFactory([5, 4, 3, 2, 7, 6, 5, 4, 3, 2]),
+        (bban: string, structure: BbanStructure) => {
+          const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER]
+            .map(p => structure.extractValueMust(bban, p))
+            .join("");
+
+          return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]));
+        },
       ),
     ),
 
@@ -707,6 +702,21 @@ export class BbanStructure {
     }
 
     return result;
+  }
+
+  /**
+   * Return part type or fail
+   */
+  extractValueMust(bban: string, partType: PartType): string {
+    const value = this.extractValue(bban, partType);
+
+    if (value === null) {
+      throw new RequiredPartTypeMissing(
+        `Required part type [${partType}] missing`,
+      );
+    }
+
+    return value;
   }
 
   /**

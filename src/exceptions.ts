@@ -71,3 +71,5 @@ export class InvalidCheckDigitException extends Error {
     this.actual = actual;
   }
 }
+
+export class RequiredPartTypeMissing extends Error {}
