@@ -1,9 +1,15 @@
 {
   "name": "ibankit",
-  "version": "1.1.4",
-  "description": "IBAN and BIC utilities",
+  "version": "1.1.5",
+  "description": "Validation, field extraction and creation of IBAN, BBAN, BIC numbers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "keywords": [
+    "IBAN",
+    "BBAN",
+    "BIC",
+    "ISO 3136-1 alpha-2"
+  ],
   "files": [
     "lib",
     "src"
@@ -21,9 +27,6 @@
   "author": "",
   "license": "ISC",
   "homepage": "https://github.com/koblas/ibankit",
-  "keywords": [
-    "IBAN"
-  ],
   "jest": {
     "moduleFileExtensions": [
       "ts",
