@@ -160,7 +160,7 @@ export class IBAN {
    */
   static isValid(iban: string): boolean {
     try {
-      ibanUtil.validate(iban);
+      ibanUtil.validate(iban.replace(/[ \t-]/g, ""));
     } catch {
       return false;
     }

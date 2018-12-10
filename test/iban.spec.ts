@@ -5,7 +5,9 @@ describe("IBAN", () => {
     it("valid iban", () => {
       expect(IBAN.isValid("BA391990440001200279")).toBe(true);
     });
-
+    it("valid with spaces", () => {
+      expect(IBAN.isValid("DE89 3704 0044 0532 0130 00")).toBe(true);
+    });
     it("bad iban", () => {
       expect(IBAN.isValid("BA391990440001200278")).toBe(false);
     });
