@@ -779,4 +779,14 @@ describe("IBAN", () => {
       expect(() => new IBAN("FR1420041010050500013M02607")).toThrow();
     });
   });
+
+  describe("sample value", () => {
+    it("FR", () => {
+      expect(IBAN.sample("FR")).toBe("FR1420041010050500013M02606");
+    });
+
+    it("germany as default", () => {
+      expect(IBAN.sample("XX")).toBe("DE89370400440532013000");
+    });
+  });
 });
