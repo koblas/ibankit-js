@@ -4,23 +4,25 @@
 [![npm version](https://badge.fury.io/js/ibankit.svg)](https://badge.fury.io/js/ibankit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koblas/ibankit-js/blob/master/LICENSE.txt)
 
-A library for generation and validation of the International Bank Account Numbers (<a href="http://en.wikipedia.org/wiki/ISO_13616" target="_blank">IBAN ISO_13616</a>) and Business Identifier Codes (<a href="http://en.wikipedia.org/wiki/ISO_9362" target="_blank">BIC ISO_9362</a>).
+A library for generation and validation of International Bank Account Numbers
+(IBAN, [ISO 13616](http://en.wikipedia.org/wiki/ISO_13616)) and Business
+Identifier Codes (BIC, [ISO_9362](http://en.wikipedia.org/wiki/ISO_9362)).
 
 #### Key Features
 
-- Drop in replacable with iban-js
+- Drop-in replaceable with [iban-js](https://www.npmjs.com/package/iban)
 - Currently conformant with Version 80 of the IBAN registry
 - Decodes bank, branch and account numbers from IBAN
 - Supports random BBAN / IBAN generation for testing
 - Has BIC validation as a bonus
 - Supports validation of National Check Digits if part of BBAN format
-- This library provides full TypesScript support
-- No external dependancies
+- Full TypesScript support
+- No external dependencies
 
-#### Iban quick examples:
+#### IBAN quick examples
 
 ```javascript
-// How to generate Iban
+// How to generate IBAN
 const ibanStr = new IBANBuilder()
   .countryCode(CountryCode.AT)
   .bankCode("19043")
@@ -28,7 +30,7 @@ const ibanStr = new IBANBuilder()
   .build()
   .toString();
 
-// How to create Iban object from String
+// How to create IBAN object from String
 const iban = new IBAN("DE89370400440532013000");
 
 // The library ignores spaces in IBANs, this is valid
@@ -49,10 +51,10 @@ IBAN.isValid("DE89 3704 0044 0532 0130 00"); // == true
 IBAN.isValid("hello world"); // == false
 ```
 
-#### Bic quick examples:
+#### BIC quick examples
 
 ```typescript
-// How to create Bic object from String
+// How to create BIC object from String
 const bic = BIC("DEUTDEFF");
 
 // Check to see is BIC code is valid
