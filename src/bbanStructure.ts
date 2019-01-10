@@ -5,6 +5,7 @@ import {
   FormatViolation,
   RequiredPartTypeMissing,
 } from "./exceptions";
+import { objectEntries, objectValues } from "./poly";
 
 /**
  * MOD11 check digit computation
@@ -57,7 +58,7 @@ function nationalFR(bban: string, structure: BbanStructure) {
     [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
       .map(p => String(structure.extractValue(bban, p)))
       .join("") + "00";
-  Object.entries(replaceChars).map(
+  objectEntries(replaceChars).map(
     ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
   );
 
@@ -873,7 +874,7 @@ export class BbanStructure {
   }
 
   static getEntries(): BbanStructure[] {
-    return Object.values(this.structures) as BbanStructure[];
+    return objectValues(this.structures) as BbanStructure[];
   }
 
   static supportedCountries(): CountryCode[] {

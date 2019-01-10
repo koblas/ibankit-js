@@ -789,4 +789,34 @@ describe("IBAN", () => {
       expect(IBAN.sample("XX")).toBe("DE89370400440532013000");
     });
   });
+
+  describe("iban-js compatability", () => {
+    it("printFormat", () => {
+      expect(IBAN.printFormat("FR1420041010050500013M02606")).toBe(
+        "FR14 2004 1010 0505 0001 3M02 606",
+      );
+    });
+
+    it("electronicFormat", () => {
+      expect(IBAN.electronicFormat(" FR14*2&004 1010050500013M02606*")).toBe(
+        "FR1420041010050500013M02606",
+      );
+    });
+
+    it("toBBAN", () => {
+      expect(IBAN.toBBAN(" FR142004 1010050500013M02606*")).toBe(
+        "20041 01005 0500013M026 06",
+      );
+    });
+
+    it("fromBBAN", () => {
+      expect(IBAN.fromBBAN("FR", "20041010050500013M02606")).toBe(
+        "FR1420041010050500013M02606",
+      );
+    });
+
+    it("isValidBBAN", () => {
+      expect(IBAN.isValidBBAN("FR", "20041010050500013M02606")).toBe(true);
+    });
+  });
 });

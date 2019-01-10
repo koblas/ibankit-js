@@ -50,22 +50,35 @@ export function calculateCheckDigit(iban: string): string {
  *         InvalidCheckDigitException if iban has invalid check digit.
  */
 export function validate(iban: string) {
-  validateEmpty(iban);
+  validateNotEmpty(iban);
   validateCountryCode(iban);
   validateCheckDigitPresence(iban);
+  validateBban(getCountryCode(iban), getBban(iban));
+  validateCheckDigit(iban);
+}
 
-  const structure = getBbanStructure(iban);
+/**
+ * Validates bban.
+ *
+ * @param countryCode country for this bban
+ * @param bban to be validated.
+ * @throws IbanFormatException if iban is invalid.
+ *         UnsupportedCountryException if iban's country is not supported.
+ *         InvalidCheckDigitException if iban has invalid check digit.
+ */
+export function validateBban(countryCode: string, bban: string) {
+  validateCountryCode(countryCode);
+
+  const structure = getBbanStructure(countryCode);
 
   if (!structure) {
     throw new Error("Internal error, expected structure");
   }
 
-  structure.validate(getBban(iban));
+  structure.validate(bban);
 
   // validateBbanLength(iban, structure);
   // validateBbanEntries(iban, structure);
-
-  validateCheckDigit(iban);
 }
 
 /**
@@ -244,8 +257,39 @@ export function replaceCheckDigit(iban: string, checkDigit: string): string {
  *
  * @return A string representing formatted Iban for printing.
  */
-export function toFormattedString(iban: string): string {
-  return iban.replace(/(.{4})/g, "$1 ").trim();
+export function toFormattedString(
+  iban: string,
+  seperator: string = " ",
+): string {
+  return iban.replace(/(.{4})/g, `$1${seperator}`).trim();
+}
+
+/* Returns formatted version of BBAN from IBAN.
+ *
+ * @return A string representing formatted BBAN in "national" format
+ */
+export function toFormattedStringBBAN(
+  iban: string,
+  seperator: string = " ",
+): string {
+  const structure = getBbanStructure(iban);
+
+  if (structure === null) {
+    throw new Error("should't happen - already validated IBAN");
+  }
+
+  const bban = getBban(iban);
+  const parts = structure.getParts().reduce(
+    (acc, part) => {
+      const value = structure.extractValue(bban, part.getPartType());
+
+      return acc.concat(value || "", part.trailingSeperator ? seperator : "");
+    },
+    [] as string[],
+  );
+  parts.pop(); // Don't care about last seperator
+
+  return parts.join("");
 }
 
 export function validateCheckDigit(iban: string) {
@@ -261,7 +305,7 @@ export function validateCheckDigit(iban: string) {
   }
 }
 
-function validateEmpty(iban: string) {
+function validateNotEmpty(iban: string) {
   if (iban == null) {
     throw new FormatException(
       FormatViolation.NOT_NULL,

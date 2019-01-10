@@ -2,6 +2,9 @@ import * as ibanUtil from "./ibanUtil";
 import { countryByCode, CountryCode } from "./country";
 import { IBANBuilder } from "./ibanBuilder";
 
+// Some useful RegEx-s
+const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
+
 const samples: Record<string, string> = {
   AD: "AD1200012030200359100100",
   AE: "AE070331234567890123456",
@@ -124,10 +127,7 @@ export class IBAN {
    *         UnsupportedCountryException if Iban's Country is not supported.
    */
   constructor(iban: string) {
-    const value = iban
-      .trim()
-      .replace(/ /g, "")
-      .toUpperCase();
+    const value = IBAN.electronicFormat(iban);
 
     ibanUtil.validate(value);
 
@@ -258,18 +258,88 @@ export class IBAN {
   }
 
   /**
-   * IBAN Validation testing
+   * IBAN Validation testing [iban-js API compatability]
    *
    * @param {string} iban
    * @returns {boolean} true if the value is a valid IBAN
    */
   static isValid(iban: string): boolean {
     try {
-      ibanUtil.validate(iban.replace(/[ \t-]/g, ""));
+      ibanUtil.validate(IBAN.electronicFormat(iban)); // will throw if not valid
     } catch {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Convert an IBAN to a formatted BBAN - with validation[iban-js API compatability]
+   *
+   * @param {string} iban
+   * @param {String} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
+   * @returns {string|*}
+   */
+  static toBBAN(iban: string, separator: string = " "): string {
+    const clean = IBAN.electronicFormat(iban);
+    ibanUtil.validate(clean);
+    return ibanUtil.toFormattedStringBBAN(clean, separator);
+  }
+
+  /**
+   * Convert the passed BBAN to an IBAN for this country specification.
+   * Please note that <i>"generation of the IBAN shall be the exclusive responsibility
+   * of the bank/branch servicing the account"</i>. * This method implements the
+   * preferred algorithm described in
+   * http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
+   *
+   * @param countryCode the country of the BBAN
+   * @param bban the BBAN to convert to IBAN
+   * @returns {string} the IBAN
+   */
+  static fromBBAN(countryCode: string, bban: string): string {
+    ibanUtil.validateBban(countryCode, IBAN.electronicFormat(bban));
+
+    const iban = `${countryCode}00${bban}`;
+    const checkDigit = ibanUtil.calculateCheckDigit(iban);
+
+    return ibanUtil.replaceCheckDigit(iban, checkDigit);
+  }
+
+  /**
+   * Check the validity of the passed BBAN. [iban-js API compatability]
+   *
+   * @param countryCode the country of the BBAN
+   * @param bban the BBAN to check the validity of
+   */
+  static isValidBBAN(countryCode: string, bban: string): boolean {
+    try {
+      ibanUtil.validateBban(countryCode, IBAN.electronicFormat(bban));
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Standard print format of an IBAN, no validation is performed [iban-js API compatability]
+   *
+   * @param iban
+   * @param separator optional (default ' ')
+   * @returns {string}
+   */
+  static printFormat(iban: string, separator: string = " "): string {
+    return ibanUtil.toFormattedString(iban, separator);
+  }
+
+  /**
+   * Electronic format of the IBAN, no validation is performed. [iban-js API compatability]
+   *
+   * @param iban
+   * @param separator
+   * @returns {string}
+   */
+  static electronicFormat(iban: string): string {
+    return iban.replace(NON_ALPHANUM, "").toUpperCase();
   }
 
   static random(cc?: CountryCode): IBAN {

@@ -56,6 +56,7 @@ export class BbanStructurePart {
   private entryType: PartType;
   private characterType: CharacterType;
   private length: number;
+  trailingSeperator: boolean;
   generate: GenerateValue;
   hasGenerator: boolean;
 
@@ -63,6 +64,7 @@ export class BbanStructurePart {
     entryType: PartType,
     characterType: CharacterType,
     length: number,
+    trailingSeperator: boolean,
     generate?: GenerateValue,
   ) {
     this.entryType = entryType;
@@ -70,30 +72,45 @@ export class BbanStructurePart {
     this.length = length;
     this.generate = generate || this.defaultGenerator;
     this.hasGenerator = !!generate;
+    this.trailingSeperator = trailingSeperator;
   }
 
   static bankCode(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(PartType.BANK_CODE, characterType, length);
+    return new BbanStructurePart(
+      PartType.BANK_CODE,
+      characterType,
+      length,
+      trailingSeperator,
+    );
   }
 
   static branchCode(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(PartType.BRANCH_CODE, characterType, length);
+    return new BbanStructurePart(
+      PartType.BRANCH_CODE,
+      characterType,
+      length,
+      trailingSeperator,
+    );
   }
 
   static accountNumber(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = true,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.ACCOUNT_NUMBER,
       characterType,
       length,
+      trailingSeperator,
     );
   }
 
@@ -101,11 +118,13 @@ export class BbanStructurePart {
     length: number,
     characterType: CharacterType,
     generate?: GenerateValue,
+    trailingSeperator: boolean = false,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.NATIONAL_CHECK_DIGIT,
       characterType,
       length,
+      trailingSeperator,
       generate,
     );
   }
@@ -113,36 +132,52 @@ export class BbanStructurePart {
   static accountType(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(PartType.ACCOUNT_TYPE, characterType, length);
+    return new BbanStructurePart(
+      PartType.ACCOUNT_TYPE,
+      characterType,
+      length,
+      trailingSeperator,
+    );
   }
 
   static currencyType(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(PartType.CURRENCY_TYPE, characterType, length);
+    return new BbanStructurePart(
+      PartType.CURRENCY_TYPE,
+      characterType,
+      length,
+      trailingSeperator,
+    );
   }
 
   static ownerAccountNumber(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = true,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.OWNER_ACCOUNT_NUMBER,
       characterType,
       length,
+      trailingSeperator,
     );
   }
 
   static identificationNumber(
     length: number,
     characterType: CharacterType,
+    trailingSeperator: boolean = true,
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.IDENTIFICATION_NUMBER,
       characterType,
       length,
+      trailingSeperator,
     );
   }
 
