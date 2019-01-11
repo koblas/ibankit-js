@@ -186,7 +186,7 @@ function nationalPT(bban: string, structure: BbanStructure) {
     .map(v => v.charCodeAt(0))
     .reduce((acc, v, idx) => (acc + (v - V0) * weights[idx]) % 97, 0);
 
-  return String(98 - remainder);
+  return String(98 - remainder).padStart(2, "0");
 }
 
 /**
