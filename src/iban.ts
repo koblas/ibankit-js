@@ -258,7 +258,7 @@ export class IBAN {
   }
 
   /**
-   * IBAN Validation testing [iban-js API compatability]
+   * IBAN Validation testing [iban-js API compatibility]
    *
    * @param {string} iban
    * @returns {boolean} true if the value is a valid IBAN
@@ -273,7 +273,7 @@ export class IBAN {
   }
 
   /**
-   * Convert an IBAN to a formatted BBAN - with validation[iban-js API compatability]
+   * Convert an IBAN to a formatted BBAN - with validation[iban-js API compatibility]
    *
    * @param {string} iban
    * @param {String} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
@@ -306,7 +306,7 @@ export class IBAN {
   }
 
   /**
-   * Check the validity of the passed BBAN. [iban-js API compatability]
+   * Check the validity of the passed BBAN. [iban-js API compatibility]
    *
    * @param countryCode the country of the BBAN
    * @param bban the BBAN to check the validity of
@@ -321,7 +321,7 @@ export class IBAN {
   }
 
   /**
-   * Standard print format of an IBAN, no validation is performed [iban-js API compatability]
+   * Standard print format of an IBAN, no validation is performed [iban-js API compatibility]
    *
    * @param iban
    * @param separator optional (default ' ')
@@ -332,7 +332,7 @@ export class IBAN {
   }
 
   /**
-   * Electronic format of the IBAN, no validation is performed. [iban-js API compatability]
+   * Electronic format of the IBAN, no validation is performed. [iban-js API compatibility]
    *
    * @param iban
    * @param separator

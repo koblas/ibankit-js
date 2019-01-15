@@ -259,9 +259,9 @@ export function replaceCheckDigit(iban: string, checkDigit: string): string {
  */
 export function toFormattedString(
   iban: string,
-  seperator: string = " ",
+  separator: string = " ",
 ): string {
-  return iban.replace(/(.{4})/g, `$1${seperator}`).trim();
+  return iban.replace(/(.{4})/g, `$1${separator}`).trim();
 }
 
 /* Returns formatted version of BBAN from IBAN.
@@ -270,7 +270,7 @@ export function toFormattedString(
  */
 export function toFormattedStringBBAN(
   iban: string,
-  seperator: string = " ",
+  separator: string = " ",
 ): string {
   const structure = getBbanStructure(iban);
 
@@ -283,11 +283,11 @@ export function toFormattedStringBBAN(
     (acc, part) => {
       const value = structure.extractValue(bban, part.getPartType());
 
-      return acc.concat(value || "", part.trailingSeperator ? seperator : "");
+      return acc.concat(value || "", part.trailingSeparator ? separator : "");
     },
     [] as string[],
   );
-  parts.pop(); // Don't care about last seperator
+  parts.pop(); // Don't care about last separator
 
   return parts.join("");
 }
