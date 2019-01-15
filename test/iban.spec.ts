@@ -790,7 +790,7 @@ describe("IBAN", () => {
     });
   });
 
-  describe("iban-js compatability", () => {
+  describe("iban-js compatibility", () => {
     it("printFormat", () => {
       expect(IBAN.printFormat("FR1420041010050500013M02606")).toBe(
         "FR14 2004 1010 0505 0001 3M02 606",
