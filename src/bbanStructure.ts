@@ -30,11 +30,21 @@ function nationalES(bban: string, structure: BbanStructure) {
   const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE]
     .map(p => structure.extractValueMust(bban, p))
     .join("");
-  const d1 = mod11(`00${combined}`, weights);
-  const d2 = mod11(
+
+  function to11(v: number) {
+    if (v === 10) {
+      return 1;
+    } else if (v === 11) {
+      return 0;
+    }
+    return v;
+  }
+
+  const d1 = to11(mod11(`00${combined}`, weights));
+  const d2 = to11(mod11(
     structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER),
     weights,
-  );
+  ));
 
   return `${d1}${d2}`;
 }
