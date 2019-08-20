@@ -652,6 +652,9 @@ describe("IBAN", () => {
     it("BJ", () => {
       const iban = new IBAN("BJ11B00610100400271101192591");
       expect(iban.getCountryCode()).toBe("BJ");
+
+      const iban2 = new IBAN("BJ66BJ0610100100144390000769");
+      expect(iban2.getCountryCode()).toBe("BJ");
     });
 
     it("CF", () => {
@@ -777,6 +780,10 @@ describe("IBAN", () => {
 
     it("FR", () => {
       expect(() => new IBAN("FR1420041010050500013M02607")).toThrow();
+    });
+
+    it("BJ", () => {
+      expect(() => new IBAN("BJ66BJ0610100100144390000760")).toThrow();
     });
   });
 

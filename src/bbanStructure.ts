@@ -315,7 +315,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.c),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(12, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     [CountryCode.BR]: new BbanStructure(
