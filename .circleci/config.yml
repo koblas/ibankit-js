@@ -39,7 +39,12 @@ jobs:
 
       - persist_to_workspace:
           root: ~/repo
-          paths: .
+          paths:
+              - lib
+              - package*
+              - node_modules
+              - LICENSE.txt
+              - README.md
 
   deploy:
     <<: *defaults
