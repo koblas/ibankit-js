@@ -3,6 +3,7 @@
   "version": "1.2.4",
   "description": "Validation, field extraction and creation of IBAN, BBAN, BIC numbers",
   "main": "lib/index.js",
+  "module": "lib/ibankit.es.js",
   "types": "lib/index.d.ts",
   "keywords": [
     "IBAN",
@@ -18,7 +19,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,8 @@
     "@types/jest": "^24.0.18",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
+    "rollup": "^1.20.3",
+    "rollup-plugin-typescript2": "^0.24.0",
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
