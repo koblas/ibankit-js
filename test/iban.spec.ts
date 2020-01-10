@@ -535,7 +535,8 @@ describe("IBAN", () => {
       const iban = new IBAN("SE4550000000058398257466");
       expect(iban.getCountryCode()).toBe("SE");
       expect(iban.getBankCode()).toBe("500");
-      expect(iban.getAccountNumber()).toBe("00000058398257466");
+      expect(iban.getAccountNumber()).toBe("0000005839825746");
+      expect(iban.getNationalCheckDigit()).toBe("6");
     });
 
     it("SI", () => {

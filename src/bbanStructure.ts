@@ -728,7 +728,8 @@ export class BbanStructure {
 
     [CountryCode.SE]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(17, CharacterType.n),
+      BbanStructurePart.accountNumber(16, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
     ),
 
     [CountryCode.SI]: new BbanStructure(
