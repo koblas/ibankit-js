@@ -39,15 +39,15 @@
     "testRegex": "/test/.*\\.(ts|tsx|js)$"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^24.0.25",
     "jest": "^24.9.0",
-    "prettier": "^1.18.2",
-    "ts-jest": "^24.0.2",
-    "tslint": "^5.18.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
+    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.4"
   },
   "dependencies": {}
 }
