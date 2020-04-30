@@ -39,16 +39,16 @@
     "testRegex": "/test/.*\\.(ts|tsx|js)$"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.25",
-    "handlebars": ">=4.3.0",
-    "jest": "^24.9.0",
-    "prettier": "^1.19.1",
-    "ts-jest": "^24.3.0",
-    "tslint": "^5.20.1",
+    "@types/jest": "^25.2.1",
+    "handlebars": "^4.7.6",
+    "jest": "^25.5.2",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.4.0",
+    "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
   },
   "dependencies": {}
 }
