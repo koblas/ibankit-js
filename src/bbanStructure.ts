@@ -411,8 +411,11 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
     ),
 
-    // Provisional
-    [CountryCode.EG]: BbanStructure.bbanFR,
+    [CountryCode.EG]: new BbanStructure(
+      BbanStructurePart.bankCode(4, CharacterType.n),
+      BbanStructurePart.branchCode(4, CharacterType.n),
+      BbanStructurePart.accountNumber(17, CharacterType.n),
+    ),
 
     [CountryCode.ES]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
