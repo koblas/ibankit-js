@@ -740,7 +740,7 @@ describe("IBAN", () => {
     });
 
     it("EG", () => {
-      const iban = new IBAN("EG2100037000671002392189379");
+      const iban = new IBAN("EG800002000156789012345180002");
       expect(iban.getCountryCode()).toBe("EG");
     });
 
