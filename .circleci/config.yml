@@ -65,13 +65,13 @@ workflows:
       - test:
           filters:
             tags:
-              only: /^v.*/
+              only: /^v?\d+\..*/
 
       - deploy:
           requires:
             - test
           filters:
             tags:
-              only: /^v.*/
+              only: /^v?\d+\..*/
             branches:
               ignore: /.*/
