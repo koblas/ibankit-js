@@ -5,6 +5,7 @@ export enum PartType {
   BANK_CODE,
   BRANCH_CODE,
   ACCOUNT_NUMBER,
+  BRANCH_CHECK_DIGIT,
   NATIONAL_CHECK_DIGIT,
   CURRENCY_TYPE,
   ACCOUNT_TYPE,
@@ -122,6 +123,21 @@ export class BbanStructurePart {
   ): BbanStructurePart {
     return new BbanStructurePart(
       PartType.NATIONAL_CHECK_DIGIT,
+      characterType,
+      length,
+      trailingSeparator,
+      generate,
+    );
+  }
+
+  static branchCheckDigit(
+    length: number,
+    characterType: CharacterType,
+    generate?: GenerateValue,
+    trailingSeparator: boolean = false,
+  ): BbanStructurePart {
+    return new BbanStructurePart(
+      PartType.BRANCH_CHECK_DIGIT,
       characterType,
       length,
       trailingSeparator,

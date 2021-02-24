@@ -22,6 +22,7 @@ export class IBANBuilder {
   private accountNumberValue?: string;
   private ownerAccountTypeValue?: string;
   private identificationNumberValue?: string;
+  private branchCheckDigitValue?: string;
 
   /**
    * Creates an Iban Builder instance.
@@ -80,6 +81,17 @@ export class IBANBuilder {
    */
   nationalCheckDigit(nationalCheckDigit: string): IBANBuilder {
     this.nationalCheckDigitValue = nationalCheckDigit;
+    return this;
+  }
+
+  /**
+   * Sets iban's national check digit.
+   *
+   * @param nationalCheckDigit String
+   * @return builder Builder
+   */
+  branchCheckDigit(branchCheckDigit: string): IBANBuilder {
+    this.branchCheckDigitValue = branchCheckDigit;
     return this;
   }
 
@@ -176,6 +188,9 @@ export class IBANBuilder {
         case PartType.BRANCH_CODE:
           parts.push(this.branchCodeValue!);
           break;
+        case PartType.BRANCH_CHECK_DIGIT:
+          parts.push(this.branchCheckDigitValue!);
+          break;
         case PartType.ACCOUNT_NUMBER:
           parts.push(this.accountNumberValue!);
           break;
@@ -237,6 +252,16 @@ export class IBANBuilder {
             throw new FormatException(
               FormatViolation.NOT_NULL,
               "branchCode is required; it cannot be null",
+            );
+          }
+          break;
+        case PartType.BRANCH_CHECK_DIGIT:
+          if (!this.branchCheckDigitValue) {
+            this.branchCheckDigitValue = entry.generate("", structure);
+          } else if (!fillRandom) {
+            throw new FormatException(
+              FormatViolation.NOT_NULL,
+              "branchCheckDigit is required; it cannot be null",
             );
           }
           break;

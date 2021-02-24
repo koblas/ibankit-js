@@ -155,7 +155,8 @@ describe("IBAN", () => {
       const iban = new IBAN("CZ6508000000192000145399");
       expect(iban.getCountryCode()).toBe("CZ");
       expect(iban.getBankCode()).toBe("0800");
-      expect(iban.getAccountNumber()).toBe("0000192000145399");
+      expect(iban.getBranchCode()).toBe("000019");
+      expect(iban.getAccountNumber()).toBe("2000145399");
     });
 
     it("DE", () => {
@@ -200,9 +201,8 @@ describe("IBAN", () => {
     it("FI", () => {
       const iban = new IBAN("FI2112345600000785");
       expect(iban.getCountryCode()).toBe("FI");
-      expect(iban.getBankCode()).toBe("123456");
-      expect(iban.getNationalCheckDigit()).toBe("5");
-      expect(iban.getAccountNumber()).toBe("0000078");
+      expect(iban.getBankCode()).toBe("123");
+      expect(iban.getAccountNumber()).toBe("45600000785");
     });
 
     it("FO", () => {
@@ -280,7 +280,8 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("HU");
       expect(iban.getBankCode()).toBe("117");
       expect(iban.getBranchCode()).toBe("7301");
-      expect(iban.getAccountNumber()).toBe("6111110180000000");
+      expect(iban.getBranchCheckDigit()).toBe("6");
+      expect(iban.getAccountNumber()).toBe("111110180000000");
       expect(iban.getNationalCheckDigit()).toBe("0");
     });
 
@@ -443,7 +444,9 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("MU");
       expect(iban.getBankCode()).toBe("BOMM01");
       expect(iban.getBranchCode()).toBe("01");
-      expect(iban.getAccountNumber()).toBe("101030300200000MUR");
+      expect(iban.getAccountNumber()).toBe("101030300200");
+      expect(iban.getAccountType()).toBe("000");
+      expect(iban.getCurrencyType()).toBe("MUR");
     });
 
     it("NL", () => {
@@ -527,7 +530,8 @@ describe("IBAN", () => {
       const iban = new IBAN("SC18SSCB11010000000000001497USD");
       expect(iban.getCountryCode()).toBe("SC");
       expect(iban.getBankCode()).toBe("SSCB");
-      expect(iban.getBranchCode()).toBe("1101");
+      expect(iban.getBranchCode()).toBe("11");
+      expect(iban.getBranchCheckDigit()).toBe("01");
       expect(iban.getAccountNumber()).toBe("0000000000001497");
     });
 
@@ -592,7 +596,8 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("TN");
       expect(iban.getBankCode()).toBe("10");
       expect(iban.getBranchCode()).toBe("006");
-      expect(iban.getAccountNumber()).toBe("035183598478831");
+      expect(iban.getAccountNumber()).toBe("0351835984788");
+      expect(iban.getNationalCheckDigit()).toBe("31");
     });
 
     it("TR", () => {

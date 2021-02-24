@@ -28,7 +28,7 @@ function mod11(value: string, weights: number[]) {
 function nationalES(bban: string, structure: BbanStructure) {
   const weights = [1, 2, 4, 8, 5, 10, 9, 7, 3, 6];
   const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE]
-    .map(p => structure.extractValueMust(bban, p))
+    .map((p) => structure.extractValueMust(bban, p))
     .join("");
 
   function to11(v: number) {
@@ -41,10 +41,9 @@ function nationalES(bban: string, structure: BbanStructure) {
   }
 
   const d1 = to11(mod11(`00${combined}`, weights));
-  const d2 = to11(mod11(
-    structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER),
-    weights,
-  ));
+  const d2 = to11(
+    mod11(structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER), weights),
+  );
 
   return `${d1}${d2}`;
 }
@@ -66,7 +65,7 @@ function nationalFR(bban: string, structure: BbanStructure) {
   };
   let combined =
     [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
-      .map(p => String(structure.extractValue(bban, p)))
+      .map((p) => String(structure.extractValue(bban, p)))
       .join("") + "00";
   objectEntries(replaceChars).map(
     ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
@@ -142,11 +141,11 @@ function nationalIT(bban: string, structure: BbanStructure) {
   const VA = "A".charCodeAt(0);
   const value =
     [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
-      .map(p => structure.extractValueMust(bban, p))
+      .map((p) => structure.extractValueMust(bban, p))
       .join("")
       .split("")
-      .map(v => v.toUpperCase().charCodeAt(0))
-      .map(v => v - (V0 <= v && v <= V9 ? V0 : VA))
+      .map((v) => v.toUpperCase().charCodeAt(0))
+      .map((v) => v - (V0 <= v && v <= V9 ? V0 : VA))
       .reduce((acc, v, idx) => acc + (idx % 2 === 0 ? odd[v] : even[v]), 0) %
     26;
 
@@ -155,7 +154,7 @@ function nationalIT(bban: string, structure: BbanStructure) {
 
 function nationalNO(bban: string, structure: BbanStructure) {
   const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER]
-    .map(p => structure.extractValueMust(bban, p))
+    .map((p) => structure.extractValueMust(bban, p))
     .join("");
 
   return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]) % 10);
@@ -190,10 +189,10 @@ function nationalPT(bban: string, structure: BbanStructure) {
     PartType.BRANCH_CODE,
     PartType.ACCOUNT_NUMBER,
   ]
-    .map(p => structure.extractValueMust(bban, p))
+    .map((p) => structure.extractValueMust(bban, p))
     .join("")
     .split("")
-    .map(v => v.charCodeAt(0))
+    .map((v) => v.charCodeAt(0))
     .reduce((acc, v, idx) => (acc + (v - V0) * weights[idx]) % 97, 0);
 
   return String(98 - remainder).padStart(2, "0");
@@ -326,9 +325,17 @@ export class BbanStructure {
       BbanStructurePart.ownerAccountNumber(1, CharacterType.c),
     ),
 
+    // https://www.nbrb.by/payment/ibanbic/ais-pbi_v2-7.pdf
+    // 4c - symbolic code of the bank from the BIC directory (SI029);
+    // 4n - balance sheet account according to the Chart of accounts of
+    //      accounting in banks and non-bank financial institutions of the
+    //      Republic of Belarus and according to the Chart of accounts of
+    //      accounting in the National Bank. Corresponds to the directory of
+    //      balance sheet accounts of RB banks (SI002) and the directory of
+    //      balance sheet accounts of the National Bank (SI001)
     [CountryCode.BY]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.c),
-      BbanStructurePart.accountType(4, CharacterType.n), // @FIXME Not sure
+      BbanStructurePart.accountType(4, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
@@ -376,9 +383,13 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
+    // Registry defines this as 4!n6!n10!n -- but does not discuss branch information
+    // This is improved with info from
+    //    https://www.cnb.cz/en/payments/iban/iban-international-bank-account-number-basic-information/
     [CountryCode.CZ]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
-      BbanStructurePart.accountNumber(16, CharacterType.n),
+      BbanStructurePart.branchCode(6, CharacterType.n),
+      BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
     [CountryCode.DE]: new BbanStructure(
@@ -389,6 +400,12 @@ export class BbanStructure {
     // Provisional
     [CountryCode.DJ]: BbanStructure.bbanFR,
 
+    // Registry defines 4!n9!n1!n -- however no information on
+    // nationalCheckDigit exist and all documentation discusses
+    // that the account number is "10 digits"
+    //
+    //  This mentions checksum
+    //    https://www.finanssiala.fi/maksujenvalitys/dokumentit/IBAN_in_payments.pdf
     [CountryCode.DK]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
@@ -417,6 +434,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(17, CharacterType.n),
     ),
 
+    // Spain is 4!n4!n1!n1!n10!n -- but the check digit is 2 digits?
     [CountryCode.ES]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
@@ -424,10 +442,11 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
+    // Additional details:
+    //  https://www.finanssiala.fi/maksujenvalitys/dokumentit/IBAN_in_payments.pdf
     [CountryCode.FI]: new BbanStructure(
-      BbanStructurePart.bankCode(6, CharacterType.n),
-      BbanStructurePart.accountNumber(7, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.bankCode(3, CharacterType.n),
+      BbanStructurePart.accountNumber(11, CharacterType.n),
     ),
 
     [CountryCode.FO]: new BbanStructure(
@@ -436,11 +455,15 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
     ),
 
+    // FR IBAN covers:
+    //  GF, GP, MQ, RE, PF, TF, YT, NC, BL, MF, PM, WF
     [CountryCode.FR]: BbanStructure.bbanFR,
 
     // Provisional
     [CountryCode.GA]: BbanStructure.bbanFR,
 
+    // GB IBAN covers:
+    //   IM, JE, GG
     [CountryCode.GB]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.branchCode(6, CharacterType.n),
@@ -457,6 +480,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(15, CharacterType.c),
     ),
 
+    // Same as DK (same issues)
     [CountryCode.GL]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
@@ -489,10 +513,14 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(20, CharacterType.n),
     ),
 
+    // Spec says account number is 1!n15!n
+    // no information on 1!n exists -- most likely a bank/branch check digit
+    //  https://stackoverflow.com/questions/40282199/hungarian-bban-validation
     [CountryCode.HU]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.accountNumber(16, CharacterType.n),
+      BbanStructurePart.branchCheckDigit(1, CharacterType.n),
+      BbanStructurePart.accountNumber(15, CharacterType.n),
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
     ),
 
@@ -585,6 +613,12 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(13, CharacterType.c),
     ),
 
+    [CountryCode.LY]: new BbanStructure(
+      BbanStructurePart.bankCode(3, CharacterType.n),
+      BbanStructurePart.branchCode(3, CharacterType.n),
+      BbanStructurePart.accountNumber(15, CharacterType.n),
+    ),
+
     // Provisional
     [CountryCode.MA]: new BbanStructure(
       BbanStructurePart.accountNumber(24, CharacterType.n),
@@ -605,8 +639,7 @@ export class BbanStructure {
     [CountryCode.ME]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(13, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
-      // @TODO checkdigit
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n), // @TODO checkdigit
     ),
 
     // Provisional
@@ -630,12 +663,6 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
 
-    [CountryCode.MT]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.a),
-      BbanStructurePart.branchCode(5, CharacterType.n),
-      BbanStructurePart.accountNumber(18, CharacterType.c),
-    ),
-
     [CountryCode.MR]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
@@ -643,10 +670,21 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
-    [CountryCode.MU]: new BbanStructure(
-      BbanStructurePart.bankCode(6, CharacterType.c),
-      BbanStructurePart.branchCode(2, CharacterType.n),
+    [CountryCode.MT]: new BbanStructure(
+      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(18, CharacterType.c),
+    ),
+
+    // Spec: 4!a2!n2!n12!n3!n3!a
+    //  No docs on the last 3!n -- assuming account type
+    //  all found IBANs have '000'
+    [CountryCode.MU]: new BbanStructure(
+      BbanStructurePart.bankCode(6, CharacterType.c), // 4!a2!n
+      BbanStructurePart.branchCode(2, CharacterType.n),
+      BbanStructurePart.accountNumber(12, CharacterType.c),
+      BbanStructurePart.accountType(3, CharacterType.n),
+      BbanStructurePart.currencyType(3, CharacterType.a),
     ),
 
     // Provisional
@@ -682,6 +720,7 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(16, CharacterType.n),
     ),
 
+    // 8!n16!n
     [CountryCode.PL]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
@@ -724,7 +763,8 @@ export class BbanStructure {
 
     [CountryCode.SC]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
-      BbanStructurePart.branchCode(4, CharacterType.n),
+      BbanStructurePart.branchCode(2, CharacterType.n),
+      BbanStructurePart.branchCheckDigit(2, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.n),
       BbanStructurePart.currencyType(3, CharacterType.a),
     ),
@@ -794,7 +834,8 @@ export class BbanStructure {
     [CountryCode.TN]: new BbanStructure(
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(15, CharacterType.c),
+      BbanStructurePart.accountNumber(13, CharacterType.c),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.c),
     ),
 
     [CountryCode.TR]: new BbanStructure(
@@ -814,7 +855,7 @@ export class BbanStructure {
     ),
 
     [CountryCode.VG]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.c),
+      BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.accountNumber(16, CharacterType.n),
     ),
 
