@@ -51,10 +51,24 @@ export function calculateCheckDigit(iban: string): string {
  */
 export function validate(iban: string) {
   validateNotEmpty(iban);
-  validateCountryCode(iban);
+  validateCountryCode(iban, true);
   validateCheckDigitPresence(iban);
   validateBban(getCountryCode(iban), getBban(iban));
-  validateCheckDigit(iban);
+  validateCheckDigitChecksum(iban);
+}
+
+/**
+ * Validates iban checksum only, does not validate country or BBAN
+ *
+ * @param iban to be validated.
+ * @throws IbanFormatException if iban is invalid.
+ *         InvalidCheckDigitException if iban has invalid check digit.
+ */
+export function validateCheckDigit(iban: string) {
+  validateNotEmpty(iban);
+  validateCheckDigitPresence(iban);
+  validateCountryCode(iban, false);
+  validateCheckDigitChecksum(iban);
 }
 
 /**
@@ -67,7 +81,7 @@ export function validate(iban: string) {
  *         InvalidCheckDigitException if iban has invalid check digit.
  */
 export function validateBban(countryCode: string, bban: string) {
-  validateCountryCode(countryCode);
+  validateCountryCode(countryCode, true);
 
   const structure = getBbanStructure(countryCode);
 
@@ -197,6 +211,16 @@ export function getNationalCheckDigit(iban: string): string | null {
 }
 
 /**
+ * Returns iban's branch check digit.
+ *
+ * @param iban String
+ * @return nationalCheckDigit String
+ */
+export function getBranchCheckDigit(iban: string): string | null {
+  return extractBbanEntry(iban, PartType.BRANCH_CHECK_DIGIT);
+}
+
+/**
  * Returns iban's currency type
  *
  * @param iban String
@@ -279,20 +303,17 @@ export function toFormattedStringBBAN(
   }
 
   const bban = getBban(iban);
-  const parts = structure.getParts().reduce(
-    (acc, part) => {
-      const value = structure.extractValue(bban, part.getPartType());
+  const parts = structure.getParts().reduce((acc, part) => {
+    const value = structure.extractValue(bban, part.getPartType());
 
-      return acc.concat(value || "", part.trailingSeparator ? separator : "");
-    },
-    [] as string[],
-  );
+    return acc.concat(value || "", part.trailingSeparator ? separator : "");
+  }, [] as string[]);
   parts.pop(); // Don't care about last separator
 
   return parts.join("");
 }
 
-export function validateCheckDigit(iban: string) {
+export function validateCheckDigitChecksum(iban: string) {
   if (calculateMod(iban) != 1) {
     const checkDigit = getCheckDigit(iban);
     const expectedCheckDigit = calculateCheckDigit(iban);
@@ -321,7 +342,7 @@ function validateNotEmpty(iban: string) {
   }
 }
 
-function validateCountryCode(iban: string) {
+function validateCountryCode(iban: string, hasStructure = true) {
   // check if iban contains 2 char country code
   if (iban.length < COUNTRY_CODE_LENGTH) {
     throw new FormatException(
@@ -351,13 +372,15 @@ function validateCountryCode(iban: string) {
     );
   }
 
-  // check if country is supported
-  const structure = BbanStructure.forCountry(country);
-  if (structure == null) {
-    throw new UnsupportedCountryException(
-      "Country code is not supported.",
-      countryCode,
-    );
+  if (hasStructure) {
+    // check if country is supported
+    const structure = BbanStructure.forCountry(country);
+    if (structure == null) {
+      throw new UnsupportedCountryException(
+        "Country code is not supported.",
+        countryCode,
+      );
+    }
   }
 }
 

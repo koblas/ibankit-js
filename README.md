@@ -11,13 +11,20 @@ Identifier Codes (BIC, [ISO_9362](http://en.wikipedia.org/wiki/ISO_9362)).
 #### Key Features
 
 - Drop-in replaceable with [iban-js](https://www.npmjs.com/package/iban)
-- Currently conformant with Version 80 of the IBAN registry
+- Currently conformant with Version 88 of the IBAN registry
 - Decodes bank, branch and account numbers from IBAN
 - Supports random BBAN / IBAN generation for testing
 - Has BIC validation as a bonus
 - Supports validation of National Check Digits if part of BBAN format
 - Full TypesScript support
 - No external dependencies
+
+## SWIFT IBAN Registry
+
+This release should be compatible with the [SWIFT IBAN Registry
+Version 88](https://www.swift.com/swift-resource/9606/download). There may be a limited number
+of value differences, some countries in the Registry doesn't describe bank/branch information
+but may expose it as `3!n4!n` but leave the branch description as a blank.
 
 #### IBAN quick examples
 
@@ -82,6 +89,6 @@ BIC.isValid("DEUTDEFF500"); // === true
 
 ## License
 
-Copyright 2018 David Koblas
+Copyright 2018-2021 David Koblas
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0

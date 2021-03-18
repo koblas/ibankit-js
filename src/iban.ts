@@ -189,6 +189,15 @@ export class IBAN {
   }
 
   /**
+   * Returns iban's national check digit.
+   *
+   * @return nationalCheckDigit String
+   */
+  public getBranchCheckDigit(): string | null {
+    return ibanUtil.getBranchCheckDigit(this.value);
+  }
+
+  /**
    * Returns iban's currency type if encoded separate from account number
    *
    * @return nationalCheckDigit String
