@@ -1,6 +1,6 @@
 {
   "name": "ibankit",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Validation, field extraction and creation of IBAN, BBAN, BIC numbers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
