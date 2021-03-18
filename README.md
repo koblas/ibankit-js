@@ -92,3 +92,4 @@ BIC.isValid("DEUTDEFF500"); // === true
 Copyright 2018-2021 David Koblas
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
