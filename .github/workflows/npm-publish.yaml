@@ -25,6 +25,7 @@ jobs:
           ${{ runner.OS }}-node-
           ${{ runner.OS }}-
     - run: npm install
+    - run: npm build
     - name: Publish if version has been updated
       uses: pascalgn/npm-publish-action@1.3.4
       with: 

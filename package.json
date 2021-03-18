@@ -11,6 +11,8 @@
     "ISO 3136-1 alpha-2"
   ],
   "files": [
+    "LICENSE.txt",
+    "README.md",
     "lib",
     "src"
   ],
