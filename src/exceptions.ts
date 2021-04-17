@@ -48,6 +48,9 @@ export class FormatException extends Error {
     this.formatViolation = formatViolation;
     this.expected = expected;
     this.actual = actual;
+
+    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, FormatException.prototype);
   }
 }
 
@@ -57,6 +60,9 @@ export class UnsupportedCountryException extends Error {
   constructor(msg: string, actual?: string) {
     super(msg);
     this.actual = actual;
+
+    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, UnsupportedCountryException.prototype);
   }
 }
 
@@ -69,7 +75,17 @@ export class InvalidCheckDigitException extends Error {
 
     this.expected = expected;
     this.actual = actual;
+
+    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, InvalidCheckDigitException.prototype);
   }
 }
 
-export class RequiredPartTypeMissing extends Error {}
+export class RequiredPartTypeMissing extends Error {
+  constructor(msg: string) {
+    super(msg);
+
+    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, RequiredPartTypeMissing.prototype);
+  }
+}
