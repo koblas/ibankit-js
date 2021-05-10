@@ -13,7 +13,7 @@
     "emitDecoratorMetadata": true,
     "declaration": true,
     "suppressImplicitAnyIndexErrors": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "inlineSourceMap": true,
     "preserveConstEnums": true,
     "noImplicitAny": true,
