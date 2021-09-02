@@ -660,7 +660,7 @@ export class BbanStructure {
     // Provisional
     [CountryCode.ML]: new BbanStructure(
       BbanStructurePart.bankCode(1, CharacterType.a),
-      BbanStructurePart.accountNumber(23, CharacterType.n),
+      BbanStructurePart.accountNumber(25, CharacterType.n),
     ),
 
     [CountryCode.MR]: new BbanStructure(
