@@ -3,11 +3,7 @@ import { BbanStructure } from "./bbanStructure";
 import { PartType } from "./structurePart";
 import { CountryCode } from "./country";
 import { randInt } from "./randInt";
-import {
-  UnsupportedCountryException,
-  FormatViolation,
-  FormatException,
-} from "./exceptions";
+import { UnsupportedCountryException, FormatViolation, FormatException } from "./exceptions";
 import { IBAN } from "./iban";
 
 /**
@@ -27,7 +23,7 @@ export class IBANBuilder {
   /**
    * Creates an Iban Builder instance.
    */
-  public constructor() {}
+  // public constructor() {}
 
   /**
    * Sets iban's country code.
@@ -174,37 +170,50 @@ export class IBANBuilder {
     const structure = BbanStructure.forCountry(this.countryCodeValue);
 
     if (structure === null) {
-      throw new UnsupportedCountryException(
-        "Country code is not supported.",
-        this.countryCodeValue,
-      );
+      throw new UnsupportedCountryException("Country code is not supported.", this.countryCodeValue);
     }
 
     for (const part of structure.getParts()) {
       switch (part.getPartType()) {
         case PartType.BANK_CODE:
-          parts.push(this.bankCodeValue!);
+          if (typeof this.bankCodeValue === "string") {
+            parts.push(this.bankCodeValue);
+          }
           break;
         case PartType.BRANCH_CODE:
-          parts.push(this.branchCodeValue!);
+          if (typeof this.branchCodeValue === "string") {
+            parts.push(this.branchCodeValue);
+          }
           break;
         case PartType.BRANCH_CHECK_DIGIT:
-          parts.push(this.branchCheckDigitValue!);
+          if (typeof this.branchCheckDigitValue === "string") {
+            parts.push(this.branchCheckDigitValue);
+          }
           break;
         case PartType.ACCOUNT_NUMBER:
-          parts.push(this.accountNumberValue!);
+          if (typeof this.accountNumberValue === "string") {
+            parts.push(this.accountNumberValue);
+          }
           break;
         case PartType.NATIONAL_CHECK_DIGIT:
-          parts.push(this.nationalCheckDigitValue!);
+          if (typeof this.nationalCheckDigitValue === "string") {
+            parts.push(this.nationalCheckDigitValue);
+          }
           break;
         case PartType.ACCOUNT_TYPE:
-          parts.push(this.accountTypeValue!);
+          if (typeof this.accountTypeValue === "string") {
+            parts.push(this.accountTypeValue);
+          }
           break;
         case PartType.OWNER_ACCOUNT_NUMBER:
-          parts.push(this.ownerAccountTypeValue!);
+          if (typeof this.ownerAccountTypeValue === "string") {
+            parts.push(this.ownerAccountTypeValue);
+          }
           break;
         case PartType.IDENTIFICATION_NUMBER:
-          parts.push(this.identificationNumberValue!);
+          if (typeof this.identificationNumberValue === "string") {
+            parts.push(this.identificationNumberValue);
+          }
           break;
       }
     }
@@ -216,19 +225,14 @@ export class IBANBuilder {
    * Returns formatted iban string with default check digit.
    */
   private formatIban(): string {
-    return `${this.countryCodeValue}${
-      ibanUtil.DEFAULT_CHECK_DIGIT
-    }${this.formatBban()}`;
+    return `${this.countryCodeValue}${ibanUtil.DEFAULT_CHECK_DIGIT}${this.formatBban()}`;
   }
 
   private fillMissingFieldsRandomly(fillRandom: boolean) {
     const structure = BbanStructure.forCountry(this.countryCodeValue);
 
     if (structure == null) {
-      throw new UnsupportedCountryException(
-        "Country code is not supported.",
-        this.countryCodeValue,
-      );
+      throw new UnsupportedCountryException("Country code is not supported.", this.countryCodeValue);
     }
 
     let needCheckDigit = false;
@@ -239,40 +243,28 @@ export class IBANBuilder {
           if (!this.bankCodeValue) {
             this.bankCodeValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "bankCode is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "bankCode is required; it cannot be null");
           }
           break;
         case PartType.BRANCH_CODE:
           if (!this.branchCodeValue) {
             this.branchCodeValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "branchCode is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "branchCode is required; it cannot be null");
           }
           break;
         case PartType.BRANCH_CHECK_DIGIT:
           if (!this.branchCheckDigitValue) {
             this.branchCheckDigitValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "branchCheckDigit is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "branchCheckDigit is required; it cannot be null");
           }
           break;
         case PartType.ACCOUNT_NUMBER:
           if (!this.accountNumberValue) {
             this.accountNumberValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "accountNumber is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "accountNumber is required; it cannot be null");
           }
           break;
         case PartType.NATIONAL_CHECK_DIGIT:
@@ -285,30 +277,21 @@ export class IBANBuilder {
           if (!this.accountTypeValue) {
             this.accountTypeValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "accountType is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "accountType is required; it cannot be null");
           }
           break;
         case PartType.OWNER_ACCOUNT_NUMBER:
           if (!this.ownerAccountTypeValue) {
             this.ownerAccountTypeValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "ownerAccountType is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "ownerAccountType is required; it cannot be null");
           }
           break;
         case PartType.IDENTIFICATION_NUMBER:
           if (!this.identificationNumberValue) {
             this.identificationNumberValue = entry.generate("", structure);
           } else if (!fillRandom) {
-            throw new FormatException(
-              FormatViolation.NOT_NULL,
-              "indentificationNumber is required; it cannot be null",
-            );
+            throw new FormatException(FormatViolation.NOT_NULL, "indentificationNumber is required; it cannot be null");
           }
           break;
       }

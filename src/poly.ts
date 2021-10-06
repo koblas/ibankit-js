@@ -1,3 +1,5 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable @typescript-eslint/ban-types */
 /*
  * Polyfill
  */
@@ -5,7 +7,7 @@
 export const objectEntries =
   typeof Object.entries === "function"
     ? Object.entries
-    : function(obj: object) {
+    : function (obj: object) {
         const entries = [];
         for (const key in obj) {
           if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
@@ -18,7 +20,7 @@ export const objectEntries =
 export const objectValues =
   typeof Object.values === "function"
     ? Object.values
-    : function(obj: object) {
+    : function (obj: object) {
         const values = [];
         for (const key in obj) {
           if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {

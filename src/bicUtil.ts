@@ -1,8 +1,4 @@
-import {
-  UnsupportedCountryException,
-  FormatException,
-  FormatViolation,
-} from "./exceptions";
+import { UnsupportedCountryException, FormatException, FormatViolation } from "./exceptions";
 import { countryByCode } from "./country";
 
 const BIC8_LENGTH = 8;
@@ -20,39 +16,33 @@ const BRANCH_CODE_LENGTH = 3;
 const ucRegex = /^[A-Z]+$/;
 const ucnumRegex = /^[A-Z0-9]+$/;
 
-/**
- * Validates bic.
- *
- * @param bic to be validated.
- * @throws FormatException if bic is invalid.
- *         UnsupportedCountryException if bic's country is not supported.
- */
-export function validate(bic: string) {
-  validateEmpty(bic);
-  validateLength(bic);
-  validateCase(bic);
-  validateBankCode(bic);
-  validateCountryCode(bic);
-  validateLocationCode(bic);
+export function getBankCode(bic: string): string {
+  return bic.substring(BANK_CODE_INDEX, BANK_CODE_INDEX + BANK_CODE_LENGTH);
+}
 
-  if (hasBranchCode(bic)) {
-    validateBranchCode(bic);
-  }
+export function getCountryCode(bic: string): string {
+  return bic.substring(COUNTRY_CODE_INDEX, COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH);
+}
+
+export function getLocationCode(bic: string): string {
+  return bic.substring(LOCATION_CODE_INDEX, LOCATION_CODE_INDEX + LOCATION_CODE_LENGTH);
+}
+
+export function getBranchCode(bic: string): string {
+  return bic.substring(BRANCH_CODE_INDEX, BRANCH_CODE_INDEX + BRANCH_CODE_LENGTH);
+}
+
+export function hasBranchCode(bic: string): boolean {
+  return bic.length === BIC11_LENGTH;
 }
 
 function validateEmpty(bic: string) {
   if (bic == null) {
-    throw new FormatException(
-      FormatViolation.NOT_NULL,
-      "Null can't be a valid Bic.",
-    );
+    throw new FormatException(FormatViolation.NOT_NULL, "Null can't be a valid Bic.");
   }
 
   if (bic.length === 0) {
-    throw new FormatException(
-      FormatViolation.NOT_EMPTY,
-      "Empty string can't be a valid Bic.",
-    );
+    throw new FormatException(FormatViolation.NOT_EMPTY, "Empty string can't be a valid Bic.");
   }
 }
 
@@ -67,10 +57,7 @@ function validateLength(bic: string) {
 
 function validateCase(bic: string) {
   if (bic !== bic.toUpperCase()) {
-    throw new FormatException(
-      FormatViolation.BIC_ONLY_UPPER_CASE_LETTERS,
-      "Bic must contain only upper case letters.",
-    );
+    throw new FormatException(FormatViolation.BIC_ONLY_UPPER_CASE_LETTERS, "Bic must contain only upper case letters.");
   }
 }
 
@@ -78,11 +65,7 @@ function validateBankCode(bic: string) {
   const bankCode = getBankCode(bic);
 
   if (!ucRegex.test(bankCode)) {
-    throw new FormatException(
-      FormatViolation.BANK_CODE_ONLY_LETTERS,
-      "Bank code must contain only letters.",
-      bankCode,
-    );
+    throw new FormatException(FormatViolation.BANK_CODE_ONLY_LETTERS, "Bank code must contain only letters.", bankCode);
   }
 }
 
@@ -102,10 +85,7 @@ function validateCountryCode(bic: string) {
   }
 
   if (countryByCode(countryCode) == null) {
-    throw new UnsupportedCountryException(
-      "Country code is not supported.",
-      countryCode,
-    );
+    throw new UnsupportedCountryException("Country code is not supported.", countryCode);
   }
 }
 
@@ -133,31 +113,22 @@ function validateBranchCode(bic: string) {
   }
 }
 
-export function getBankCode(bic: string) {
-  return bic.substring(BANK_CODE_INDEX, BANK_CODE_INDEX + BANK_CODE_LENGTH);
-}
+/**
+ * Validates bic.
+ *
+ * @param bic to be validated.
+ * @throws FormatException if bic is invalid.
+ *         UnsupportedCountryException if bic's country is not supported.
+ */
+export function validate(bic: string): void {
+  validateEmpty(bic);
+  validateLength(bic);
+  validateCase(bic);
+  validateBankCode(bic);
+  validateCountryCode(bic);
+  validateLocationCode(bic);
 
-export function getCountryCode(bic: string) {
-  return bic.substring(
-    COUNTRY_CODE_INDEX,
-    COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH,
-  );
-}
-
-export function getLocationCode(bic: string) {
-  return bic.substring(
-    LOCATION_CODE_INDEX,
-    LOCATION_CODE_INDEX + LOCATION_CODE_LENGTH,
-  );
-}
-
-export function getBranchCode(bic: string) {
-  return bic.substring(
-    BRANCH_CODE_INDEX,
-    BRANCH_CODE_INDEX + BRANCH_CODE_LENGTH,
-  );
-}
-
-export function hasBranchCode(bic: string) {
-  return bic.length === BIC11_LENGTH;
+  if (hasBranchCode(bic)) {
+    validateBranchCode(bic);
+  }
 }

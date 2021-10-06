@@ -253,7 +253,7 @@ export class IBAN {
    *         UnsupportedCountryException if Iban's Country is not supported.
    *
    */
-  toString() {
+  toString(): string {
     return this.value;
   }
 
@@ -365,6 +365,6 @@ export class IBAN {
   static sample(cc: CountryCode | string): string {
     const s = samples[cc];
 
-    return s !== undefined ? s : samples["DE"];
+    return s !== undefined ? s : samples[CountryCode.DE];
   }
 }

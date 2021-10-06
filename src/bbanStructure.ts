@@ -1,10 +1,6 @@
 import { CharacterType, BbanStructurePart, PartType } from "./structurePart";
 import { CountryCode } from "./country";
-import {
-  FormatException,
-  FormatViolation,
-  RequiredPartTypeMissing,
-} from "./exceptions";
+import { FormatException, FormatViolation, RequiredPartTypeMissing } from "./exceptions";
 import { objectEntries, objectValues } from "./poly";
 
 /**
@@ -12,24 +8,13 @@ import { objectEntries, objectValues } from "./poly";
  */
 function mod11(value: string, weights: number[]) {
   return (
-    (11 -
-      (value
-        .split("")
-        .reduce(
-          (acc, s, idx) =>
-            acc + parseInt(s, 10) * weights[idx % weights.length],
-          0,
-        ) %
-        11)) %
-    11
+    (11 - (value.split("").reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx % weights.length], 0) % 11)) % 11
   );
 }
 
 function nationalES(bban: string, structure: BbanStructure) {
   const weights = [1, 2, 4, 8, 5, 10, 9, 7, 3, 6];
-  const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE]
-    .map((p) => structure.extractValueMust(bban, p))
-    .join("");
+  const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE].map((p) => structure.extractValueMust(bban, p)).join("");
 
   function to11(v: number) {
     if (v === 10) {
@@ -41,9 +26,7 @@ function nationalES(bban: string, structure: BbanStructure) {
   }
 
   const d1 = to11(mod11(`00${combined}`, weights));
-  const d2 = to11(
-    mod11(structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER), weights),
-  );
+  const d2 = to11(mod11(structure.extractValueMust(bban, PartType.ACCOUNT_NUMBER), weights));
 
   return `${d1}${d2}`;
 }
@@ -67,75 +50,17 @@ function nationalFR(bban: string, structure: BbanStructure) {
     [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
       .map((p) => String(structure.extractValue(bban, p)))
       .join("") + "00";
-  objectEntries(replaceChars).map(
-    ([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)),
-  );
+  objectEntries(replaceChars).map(([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)));
 
   // Number is bigger than max integer, take the mod%97 by hand
-  const expected =
-    97 -
-    combined.split("").reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
+  const expected = 97 - combined.split("").reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
 
   return String(expected).padStart(2, "0");
 }
 
 function nationalIT(bban: string, structure: BbanStructure) {
-  const even = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-    24,
-    25,
-  ];
-  const odd = [
-    1,
-    0,
-    5,
-    7,
-    9,
-    13,
-    15,
-    17,
-    19,
-    21,
-    2,
-    4,
-    18,
-    20,
-    11,
-    3,
-    6,
-    8,
-    12,
-    14,
-    16,
-    10,
-    22,
-    25,
-    24,
-    23,
-  ];
+  const even = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+  const odd = [1, 0, 5, 7, 9, 13, 15, 17, 19, 21, 2, 4, 18, 20, 11, 3, 6, 8, 12, 14, 16, 10, 22, 25, 24, 23];
   const V0 = "0".charCodeAt(0);
   const V9 = "9".charCodeAt(0);
   const VA = "A".charCodeAt(0);
@@ -146,16 +71,13 @@ function nationalIT(bban: string, structure: BbanStructure) {
       .split("")
       .map((v) => v.toUpperCase().charCodeAt(0))
       .map((v) => v - (V0 <= v && v <= V9 ? V0 : VA))
-      .reduce((acc, v, idx) => acc + (idx % 2 === 0 ? odd[v] : even[v]), 0) %
-    26;
+      .reduce((acc, v, idx) => acc + (idx % 2 === 0 ? odd[v] : even[v]), 0) % 26;
 
   return String.fromCharCode(VA + value);
 }
 
 function nationalNO(bban: string, structure: BbanStructure) {
-  const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER]
-    .map((p) => structure.extractValueMust(bban, p))
-    .join("");
+  const value = [PartType.BANK_CODE, PartType.ACCOUNT_NUMBER].map((p) => structure.extractValueMust(bban, p)).join("");
 
   return String(mod11(value, [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]) % 10);
 }
@@ -163,32 +85,8 @@ function nationalNO(bban: string, structure: BbanStructure) {
 // ISO 7064 MOD 10
 function nationalPT(bban: string, structure: BbanStructure) {
   const V0 = "0".charCodeAt(0);
-  const weights = [
-    73,
-    17,
-    89,
-    38,
-    62,
-    45,
-    53,
-    15,
-    50,
-    5,
-    49,
-    34,
-    81,
-    76,
-    27,
-    90,
-    9,
-    30,
-    3,
-  ];
-  const remainder = [
-    PartType.BANK_CODE,
-    PartType.BRANCH_CODE,
-    PartType.ACCOUNT_NUMBER,
-  ]
+  const weights = [73, 17, 89, 38, 62, 45, 53, 15, 50, 5, 49, 34, 81, 76, 27, 90, 9, 30, 3];
+  const remainder = [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
     .map((p) => structure.extractValueMust(bban, p))
     .join("")
     .split("")
@@ -232,9 +130,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.AO]: new BbanStructure(
-      BbanStructurePart.accountNumber(21, CharacterType.n),
-    ),
+    [CountryCode.AO]: new BbanStructure(BbanStructurePart.accountNumber(21, CharacterType.n)),
 
     [CountryCode.AT]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
@@ -256,41 +152,29 @@ export class BbanStructure {
     [CountryCode.BE]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(7, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(
-        2,
-        CharacterType.n,
-        (bban: string, structure: BbanStructure) => {
-          const accountNumber = structure.extractValue(
-            bban,
-            PartType.ACCOUNT_NUMBER,
-          );
-          const bankCode = structure.extractValue(bban, PartType.BANK_CODE);
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, (bban: string, structure: BbanStructure) => {
+        const accountNumber = structure.extractValue(bban, PartType.ACCOUNT_NUMBER);
+        const bankCode = structure.extractValue(bban, PartType.BANK_CODE);
 
-          if (accountNumber === null || bankCode === null) {
-            throw new FormatException(
-              FormatViolation.NOT_EMPTY,
-              "account number or bank code missing",
-            );
-          }
+        if (accountNumber === null || bankCode === null) {
+          throw new FormatException(FormatViolation.NOT_EMPTY, "account number or bank code missing");
+        }
 
-          const value = parseInt(`${bankCode}${accountNumber}`, 10);
+        const value = parseInt(`${bankCode}${accountNumber}`, 10);
 
-          const remainder = Math.floor(value / 97);
+        const remainder = Math.floor(value / 97);
 
-          let expected = value - remainder * 97;
-          if (expected === 0) {
-            expected = 97;
-          }
+        let expected = value - remainder * 97;
+        if (expected === 0) {
+          expected = 97;
+        }
 
-          return String(expected).padStart(2, "0");
-        },
-      ),
+        return String(expected).padStart(2, "0");
+      }),
     ),
 
     // Provisional
-    [CountryCode.BF]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-    ),
+    [CountryCode.BF]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
 
     [CountryCode.BG]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -305,9 +189,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.BI]: new BbanStructure(
-      BbanStructurePart.accountNumber(12, CharacterType.n),
-    ),
+    [CountryCode.BI]: new BbanStructure(BbanStructurePart.accountNumber(12, CharacterType.n)),
 
     // Provisional
     [CountryCode.BJ]: new BbanStructure(
@@ -363,9 +245,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.CM]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-    ),
+    [CountryCode.CM]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
 
     [CountryCode.CR]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
@@ -373,9 +253,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.CV]: new BbanStructure(
-      BbanStructurePart.accountNumber(21, CharacterType.n),
-    ),
+    [CountryCode.CV]: new BbanStructure(BbanStructurePart.accountNumber(21, CharacterType.n)),
 
     [CountryCode.CY]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
@@ -417,9 +295,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.DZ]: new BbanStructure(
-      BbanStructurePart.accountNumber(20, CharacterType.n),
-    ),
+    [CountryCode.DZ]: new BbanStructure(BbanStructurePart.accountNumber(20, CharacterType.n)),
 
     [CountryCode.EE]: new BbanStructure(
       BbanStructurePart.bankCode(2, CharacterType.n),
@@ -569,9 +445,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.KM]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-    ),
+    [CountryCode.KM]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
 
     [CountryCode.KW]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -620,9 +494,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.MA]: new BbanStructure(
-      BbanStructurePart.accountNumber(24, CharacterType.n),
-    ),
+    [CountryCode.MA]: new BbanStructure(BbanStructurePart.accountNumber(24, CharacterType.n)),
 
     [CountryCode.MC]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
@@ -688,9 +560,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.MZ]: new BbanStructure(
-      BbanStructurePart.accountNumber(21, CharacterType.n),
-    ),
+    [CountryCode.MZ]: new BbanStructure(BbanStructurePart.accountNumber(21, CharacterType.n)),
 
     // Provisional
     [CountryCode.NE]: new BbanStructure(
@@ -866,6 +736,7 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
   };
+
   private entries: BbanStructurePart[];
 
   private constructor(...entries: BbanStructurePart[]) {
@@ -876,7 +747,7 @@ export class BbanStructure {
     return this.entries;
   }
 
-  validate(bban: string) {
+  validate(bban: string): void {
     this.validateBbanLength(bban);
     this.validateBbanEntries(bban);
   }
@@ -885,12 +756,9 @@ export class BbanStructure {
     let bbanPartOffset = 0;
     let result = null;
 
-    for (let part of this.getParts()) {
+    for (const part of this.getParts()) {
       const partLength = part.getLength();
-      const partValue = bban.substring(
-        bbanPartOffset,
-        bbanPartOffset + partLength,
-      );
+      const partValue = bban.substring(bbanPartOffset, bbanPartOffset + partLength);
 
       bbanPartOffset = bbanPartOffset + partLength;
       if (part.getPartType() == partType) {
@@ -908,9 +776,7 @@ export class BbanStructure {
     const value = this.extractValue(bban, partType);
 
     if (value === null) {
-      throw new RequiredPartTypeMissing(
-        `Required part type [${partType}] missing`,
-      );
+      throw new RequiredPartTypeMissing(`Required part type [${partType}] missing`);
     }
 
     return value;
@@ -920,9 +786,7 @@ export class BbanStructure {
    * @param countryCode the country code.
    * @return BbanStructure for specified country or null if country is not supported.
    */
-  static forCountry(
-    countryCode: CountryCode | string | undefined,
-  ): BbanStructure | null {
+  static forCountry(countryCode: CountryCode | string | undefined): BbanStructure | null {
     if (!countryCode) {
       return null;
     }
@@ -963,7 +827,7 @@ export class BbanStructure {
   private validateBbanEntries(bban: string) {
     let offset = 0;
 
-    for (let part of this.getParts()) {
+    for (const part of this.getParts()) {
       const partLength = part.getLength();
       const entryValue = bban.substring(offset, offset + partLength);
 
@@ -974,11 +838,7 @@ export class BbanStructure {
     }
   }
 
-  private validateBbanEntryCharacterType(
-    bban: string,
-    part: BbanStructurePart,
-    entryValue: string,
-  ) {
+  private validateBbanEntryCharacterType(bban: string, part: BbanStructurePart, entryValue: string) {
     if (!part.validate(entryValue)) {
       switch (part.getCharacterType()) {
         case CharacterType.a:
@@ -1002,10 +862,7 @@ export class BbanStructure {
       }
     }
 
-    if (
-      part.getPartType() === PartType.NATIONAL_CHECK_DIGIT &&
-      part.hasGenerator
-    ) {
+    if (part.getPartType() === PartType.NATIONAL_CHECK_DIGIT && part.hasGenerator) {
       const expected = part.generate(bban, this);
 
       if (entryValue !== expected) {

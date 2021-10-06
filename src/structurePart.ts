@@ -76,17 +76,8 @@ export class BbanStructurePart {
     this.trailingSeparator = trailingSeparator;
   }
 
-  static bankCode(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = true,
-  ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.BANK_CODE,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+  static bankCode(length: number, characterType: CharacterType, trailingSeparator: boolean = true): BbanStructurePart {
+    return new BbanStructurePart(PartType.BANK_CODE, characterType, length, trailingSeparator);
   }
 
   static branchCode(
@@ -94,12 +85,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.BRANCH_CODE,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.BRANCH_CODE, characterType, length, trailingSeparator);
   }
 
   static accountNumber(
@@ -107,12 +93,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.ACCOUNT_NUMBER,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.ACCOUNT_NUMBER, characterType, length, trailingSeparator);
   }
 
   static nationalCheckDigit(
@@ -121,13 +102,7 @@ export class BbanStructurePart {
     generate?: GenerateValue,
     trailingSeparator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.NATIONAL_CHECK_DIGIT,
-      characterType,
-      length,
-      trailingSeparator,
-      generate,
-    );
+    return new BbanStructurePart(PartType.NATIONAL_CHECK_DIGIT, characterType, length, trailingSeparator, generate);
   }
 
   static branchCheckDigit(
@@ -136,13 +111,7 @@ export class BbanStructurePart {
     generate?: GenerateValue,
     trailingSeparator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.BRANCH_CHECK_DIGIT,
-      characterType,
-      length,
-      trailingSeparator,
-      generate,
-    );
+    return new BbanStructurePart(PartType.BRANCH_CHECK_DIGIT, characterType, length, trailingSeparator, generate);
   }
 
   static accountType(
@@ -150,12 +119,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.ACCOUNT_TYPE,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.ACCOUNT_TYPE, characterType, length, trailingSeparator);
   }
 
   static currencyType(
@@ -163,12 +127,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = false,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.CURRENCY_TYPE,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.CURRENCY_TYPE, characterType, length, trailingSeparator);
   }
 
   static ownerAccountNumber(
@@ -176,12 +135,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.OWNER_ACCOUNT_NUMBER,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.OWNER_ACCOUNT_NUMBER, characterType, length, trailingSeparator);
   }
 
   static identificationNumber(
@@ -189,12 +143,7 @@ export class BbanStructurePart {
     characterType: CharacterType,
     trailingSeparator: boolean = true,
   ): BbanStructurePart {
-    return new BbanStructurePart(
-      PartType.IDENTIFICATION_NUMBER,
-      characterType,
-      length,
-      trailingSeparator,
-    );
+    return new BbanStructurePart(PartType.IDENTIFICATION_NUMBER, characterType, length, trailingSeparator);
   }
 
   getPartType(): PartType {
@@ -219,10 +168,11 @@ export class BbanStructurePart {
   /**
    * Default generator to use -- just generate random sequence
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private defaultGenerator(bban: string, structure: BbanStructure): string {
     const charChoices = charByCharacterType[this.characterType];
 
-    let s: string[] = [];
+    const s: string[] = [];
     for (let i = 0; i < this.getLength(); i += 1) {
       s.push(charChoices[randInt(charChoices.length)]);
     }

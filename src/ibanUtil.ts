@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { CountryCode, countryByCode } from "./country";
 import { BbanStructure } from "./bbanStructure";
 import { PartType } from "./structurePart";
@@ -49,7 +50,7 @@ export function calculateCheckDigit(iban: string): string {
  *         UnsupportedCountryException if iban's country is not supported.
  *         InvalidCheckDigitException if iban has invalid check digit.
  */
-export function validate(iban: string) {
+export function validate(iban: string): void {
   validateNotEmpty(iban);
   validateCountryCode(iban, true);
   validateCheckDigitPresence(iban);
@@ -64,7 +65,7 @@ export function validate(iban: string) {
  * @throws IbanFormatException if iban is invalid.
  *         InvalidCheckDigitException if iban has invalid check digit.
  */
-export function validateCheckDigit(iban: string) {
+export function validateCheckDigit(iban: string): void {
   validateNotEmpty(iban);
   validateCheckDigitPresence(iban);
   validateCountryCode(iban, false);
@@ -80,7 +81,7 @@ export function validateCheckDigit(iban: string) {
  *         UnsupportedCountryException if iban's country is not supported.
  *         InvalidCheckDigitException if iban has invalid check digit.
  */
-export function validateBban(countryCode: string, bban: string) {
+export function validateBban(countryCode: string, bban: string): void {
   validateCountryCode(countryCode, true);
 
   const structure = getBbanStructure(countryCode);
@@ -128,10 +129,7 @@ export function getIbanLength(countryCode: CountryCode): number {
  * @return checkDigit String
  */
 export function getCheckDigit(iban: string): string {
-  return iban.substring(
-    CHECK_DIGIT_INDEX,
-    CHECK_DIGIT_INDEX + CHECK_DIGIT_LENGTH,
-  );
+  return iban.substring(CHECK_DIGIT_INDEX, CHECK_DIGIT_INDEX + CHECK_DIGIT_LENGTH);
 }
 
 /**
@@ -141,10 +139,7 @@ export function getCheckDigit(iban: string): string {
  * @return countryCode String
  */
 export function getCountryCode(iban: string): string {
-  return iban.substring(
-    COUNTRY_CODE_INDEX,
-    COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH,
-  );
+  return iban.substring(COUNTRY_CODE_INDEX, COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH);
 }
 
 /**
@@ -154,10 +149,7 @@ export function getCountryCode(iban: string): string {
  * @return countryCodeAndCheckDigit String
  */
 export function getCountryCodeAndCheckDigit(iban: string): string {
-  return iban.substring(
-    COUNTRY_CODE_INDEX,
-    COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH + CHECK_DIGIT_LENGTH,
-  );
+  return iban.substring(COUNTRY_CODE_INDEX, COUNTRY_CODE_INDEX + COUNTRY_CODE_LENGTH + CHECK_DIGIT_LENGTH);
 }
 
 /**
@@ -281,10 +273,7 @@ export function replaceCheckDigit(iban: string, checkDigit: string): string {
  *
  * @return A string representing formatted Iban for printing.
  */
-export function toFormattedString(
-  iban: string,
-  separator: string = " ",
-): string {
+export function toFormattedString(iban: string, separator: string = " "): string {
   return iban.replace(/(.{4})/g, `$1${separator}`).trim();
 }
 
@@ -292,10 +281,7 @@ export function toFormattedString(
  *
  * @return A string representing formatted BBAN in "national" format
  */
-export function toFormattedStringBBAN(
-  iban: string,
-  separator: string = " ",
-): string {
+export function toFormattedStringBBAN(iban: string, separator: string = " "): string {
   const structure = getBbanStructure(iban);
 
   if (structure === null) {
@@ -313,7 +299,7 @@ export function toFormattedStringBBAN(
   return parts.join("");
 }
 
-export function validateCheckDigitChecksum(iban: string) {
+export function validateCheckDigitChecksum(iban: string): void {
   if (calculateMod(iban) != 1) {
     const checkDigit = getCheckDigit(iban);
     const expectedCheckDigit = calculateCheckDigit(iban);
@@ -328,28 +314,18 @@ export function validateCheckDigitChecksum(iban: string) {
 
 function validateNotEmpty(iban: string) {
   if (iban == null) {
-    throw new FormatException(
-      FormatViolation.NOT_NULL,
-      "Null can't be a valid Iban.",
-    );
+    throw new FormatException(FormatViolation.NOT_NULL, "Null can't be a valid Iban.");
   }
 
   if (iban.length === 0) {
-    throw new FormatException(
-      FormatViolation.NOT_EMPTY,
-      "Empty string can't be a valid Iban.",
-    );
+    throw new FormatException(FormatViolation.NOT_EMPTY, "Empty string can't be a valid Iban.");
   }
 }
 
 function validateCountryCode(iban: string, hasStructure = true) {
   // check if iban contains 2 char country code
   if (iban.length < COUNTRY_CODE_LENGTH) {
-    throw new FormatException(
-      FormatViolation.COUNTRY_CODE_TWO_LETTERS,
-      "Iban must contain 2 char country code.",
-      iban,
-    );
+    throw new FormatException(FormatViolation.COUNTRY_CODE_TWO_LETTERS, "Iban must contain 2 char country code.", iban);
   }
 
   const countryCode = getCountryCode(iban);
@@ -376,10 +352,7 @@ function validateCountryCode(iban: string, hasStructure = true) {
     // check if country is supported
     const structure = BbanStructure.forCountry(country);
     if (structure == null) {
-      throw new UnsupportedCountryException(
-        "Country code is not supported.",
-        countryCode,
-      );
+      throw new UnsupportedCountryException("Country code is not supported.", countryCode);
     }
   }
 }
@@ -430,19 +403,15 @@ function calculateMod(iban: string): number {
   const total = reformattedIban
     .toUpperCase()
     .split("")
-    .reduce((total, ch) => {
+    .reduce((totalValue, ch) => {
       const code = ch.charCodeAt(0);
 
       if (VA <= code && code <= VZ) {
-        return addSum(total, code - VA + 10);
+        return addSum(totalValue, code - VA + 10);
       } else if (V0 <= code && code <= V9) {
-        return addSum(total, code - V0);
+        return addSum(totalValue, code - V0);
       } else {
-        throw new FormatException(
-          FormatViolation.IBAN_VALID_CHARACTERS,
-          `Invalid Character[${ch}] = '${code}'`,
-          ch,
-        );
+        throw new FormatException(FormatViolation.IBAN_VALID_CHARACTERS, `Invalid Character[${ch}] = '${code}'`, ch);
       }
     }, 0);
 
@@ -459,9 +428,7 @@ function getBbanStructure(iban: string): BbanStructure | null {
   return getBbanStructureByCountry(countryCode);
 }
 
-function getBbanStructureByCountry(
-  countryCode: CountryCode,
-): BbanStructure | null {
+function getBbanStructureByCountry(countryCode: CountryCode): BbanStructure | null {
   return BbanStructure.forCountry(countryCode);
 }
 
