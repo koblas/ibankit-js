@@ -11,7 +11,7 @@ Identifier Codes (BIC, [ISO_9362](http://en.wikipedia.org/wiki/ISO_9362)).
 #### Key Features
 
 - Drop-in replaceable with [iban-js](https://www.npmjs.com/package/iban)
-- Currently conformant with Version 88 of the IBAN registry
+- Currently conformant with Version 95 (July 2023) of the IBAN registry
 - Decodes bank, branch and account numbers from IBAN
 - Supports random BBAN / IBAN generation for testing
 - Has BIC validation as a bonus
@@ -22,7 +22,7 @@ Identifier Codes (BIC, [ISO_9362](http://en.wikipedia.org/wiki/ISO_9362)).
 ## SWIFT IBAN Registry
 
 This release should be compatible with the [SWIFT IBAN Registry
-Version 88](https://www.swift.com/swift-resource/9606/download). There may be a limited number
+Version 95](https://www.swift.com/swift-resource/9606/download). There may be a limited number
 of value differences, some countries in the Registry doesn't describe bank/branch information
 but may expose it as `3!n4!n` but leave the branch description as a blank.
 
@@ -46,10 +46,7 @@ const iban = new IBAN("DE89 3704 0044 0532 0130 00");
 // For testing, the library will also generate random IBANs
 const iban = IBAN.random(CountryCode.AT);
 const iban = IBAN.random();
-const iban = new IBANBuilder()
-  .countryCode(CountryCode.AT)
-  .bankCode("19043")
-  .build();
+const iban = new IBANBuilder().countryCode(CountryCode.AT).bankCode("19043").build();
 
 // For simplicity in porting from iban-js applications
 // you can quickly check validity
@@ -92,4 +89,3 @@ BIC.isValid("DEUTDEFF500"); // === true
 Copyright 2018-2021 David Koblas
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
-
