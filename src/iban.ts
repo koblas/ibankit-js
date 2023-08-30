@@ -3,7 +3,7 @@ import { countryByCode, CountryCode } from "./country";
 import { IBANBuilder } from "./ibanBuilder";
 
 // Some useful RegEx-s
-const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
+const NON_ALPHANUM = /[^a-z0-9]/ig;
 
 const samples: Record<string, string> = {
   AD: "AD1200012030200359100100",
