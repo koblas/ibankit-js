@@ -1,6 +1,5 @@
 # ibankit
 
-[![CircleCI](https://circleci.com/gh/koblas/ibankit-js/tree/master.svg?style=svg)](https://circleci.com/gh/koblas/ibankit-js/tree/master)
 [![npm version](https://badge.fury.io/js/ibankit.svg)](https://badge.fury.io/js/ibankit)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/koblas/ibankit-js/blob/master/LICENSE.txt)
 
