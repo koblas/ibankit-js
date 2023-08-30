@@ -34,7 +34,9 @@ export enum FormatViolation {
 
 export class FormatException extends Error {
   formatViolation: FormatViolation;
+
   actual?: string;
+
   expected?: string;
 
   constructor(
@@ -68,6 +70,7 @@ export class UnsupportedCountryException extends Error {
 
 export class InvalidCheckDigitException extends Error {
   actual?: string;
+
   expected?: string;
 
   constructor(msg: string, expected?: string, actual?: string) {

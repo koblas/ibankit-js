@@ -1,5 +1,3 @@
-import { objectEntries } from "./poly";
-
 /**
  * Country Code Enum
  *
@@ -259,7 +257,7 @@ export enum CountryCode {
   ZW = "ZW",
 }
 
-const countryData: Record<CountryCode, string[]> = {
+const countryData: Record<CountryCode, [string, string]> = {
   [CountryCode.AD]: ["Andorra", "AND"],
   [CountryCode.AE]: ["United Arab Emirates", "ARE"],
   [CountryCode.AF]: ["Afghanistan", "AFG"],
@@ -512,15 +510,15 @@ const countryData: Record<CountryCode, string[]> = {
   [CountryCode.ZW]: ["Zimbabwe", "ZWE"],
 };
 
-const by2code = objectEntries(countryData).reduce((acc, [k, v]) => {
-  acc[k] = [k, v];
+const by2code = Object.entries(countryData).reduce((acc, [k, v]) => {
+  acc[k] = [k as CountryCode, v];
   return acc;
-}, {});
+}, {} as Record<string, [CountryCode, [string, string]]>);
 
-const by3code = objectEntries(countryData).reduce((acc, [k, v]) => {
-  acc[v[1]] = [k, v];
+const by3code = Object.entries(countryData).reduce((acc, [k, v]) => {
+  acc[v[1]] = [k as CountryCode, v];
   return acc;
-}, {});
+}, {} as Record<string, [CountryCode, [string, string]]>);
 
 export function countryByCode(code: string): CountryCode | null {
   if (code === null) {

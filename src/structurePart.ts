@@ -55,10 +55,15 @@ type GenerateValue = (bban: string, structure: BbanStructure) => string;
 
 export class BbanStructurePart {
   private entryType: PartType;
+
   private characterType: CharacterType;
+
   private length: number;
+
   trailingSeparator: boolean;
+
   generate: GenerateValue;
+
   hasGenerator: boolean;
 
   private constructor(

@@ -111,6 +111,14 @@ describe("IBAN", () => {
       expect(iban.getAccountNumber()).toBe("00001299123456");
     });
 
+    it("BI", () => {
+      const iban = new IBAN("BI4210000100010000332045181");
+      expect(iban.getCountryCode()).toBe("BI");
+      expect(iban.getBankCode()).toBe("10000");
+      expect(iban.getBranchCode()).toBe("10001");
+      expect(iban.getAccountNumber()).toBe("00003320451");
+    });
+
     it("BR", () => {
       const iban = new IBAN("BR9700360305000010009795493P1");
       expect(iban.getCountryCode()).toBe("BR");
@@ -166,6 +174,14 @@ describe("IBAN", () => {
       expect(iban.getAccountNumber()).toBe("0532013000");
     });
 
+    it("DJ", () => {
+      const iban = new IBAN("DJ2100010000000154000100186");
+      expect(iban.getCountryCode()).toBe("DJ");
+      expect(iban.getBankCode()).toBe("00010");
+      expect(iban.getBranchCode()).toBe("00000");
+      expect(iban.getAccountNumber()).toBe("01540001001");
+    });
+
     it("DK", () => {
       const iban = new IBAN("DK5000400440116243");
       expect(iban.getCountryCode()).toBe("DK");
@@ -189,6 +205,14 @@ describe("IBAN", () => {
       expect(iban.getNationalCheckDigit()).toBe("5");
     });
 
+    it("EG", () => {
+      const iban = new IBAN("EG380019000500000000263180002");
+      expect(iban.getCountryCode()).toBe("EG");
+      expect(iban.getBankCode()).toBe("0019");
+      expect(iban.getBranchCode()).toBe("0005");
+      expect(iban.getAccountNumber()).toBe("00000000263180002");
+    });
+
     it("ES", () => {
       const iban = new IBAN("ES9121000418450200051332");
       expect(iban.getCountryCode()).toBe("ES");
@@ -203,6 +227,13 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("FI");
       expect(iban.getBankCode()).toBe("123");
       expect(iban.getAccountNumber()).toBe("45600000785");
+    });
+
+    it("FK", () => {
+      const iban = new IBAN("FK88SC123456789012");
+      expect(iban.getCountryCode()).toBe("FK");
+      expect(iban.getBankCode()).toBe("SC");
+      expect(iban.getAccountNumber()).toBe("123456789012");
     });
 
     it("FO", () => {
@@ -390,6 +421,14 @@ describe("IBAN", () => {
       expect(iban.getAccountNumber()).toBe("0000435195001");
     });
 
+    it("LY", () => {
+      const iban = new IBAN("LY83002048000020100120361");
+      expect(iban.getCountryCode()).toBe("LY");
+      expect(iban.getBankCode()).toBe("002");
+      expect(iban.getBranchCode()).toBe("048");
+      expect(iban.getAccountNumber()).toBe("000020100120361");
+    });
+
     it("MC", () => {
       const iban = new IBAN("MC5811222000010123456789030");
       expect(iban.getCountryCode()).toBe("MC");
@@ -422,6 +461,13 @@ describe("IBAN", () => {
       expect(iban.getNationalCheckDigit()).toBe("84");
     });
 
+    it("MN", () => {
+      const iban = new IBAN("MN121234123456789123");
+      expect(iban.getCountryCode()).toBe("MN");
+      expect(iban.getBankCode()).toBe("1234");
+      expect(iban.getAccountNumber()).toBe("123456789123");
+    });
+
     it("MR", () => {
       const iban = new IBAN("MR1300020001010000123456753");
       expect(iban.getCountryCode()).toBe("MR");
@@ -447,6 +493,13 @@ describe("IBAN", () => {
       expect(iban.getAccountNumber()).toBe("101030300200");
       expect(iban.getAccountType()).toBe("000");
       expect(iban.getCurrencyType()).toBe("MUR");
+    });
+
+    it("NI", () => {
+      const iban = new IBAN("NI79BAMC00000000000003123123");
+      expect(iban.getCountryCode()).toBe("NI");
+      expect(iban.getBankCode()).toBe("BAMC");
+      expect(iban.getAccountNumber()).toBe("00000000000003123123");
     });
 
     it("NL", () => {
@@ -519,6 +572,14 @@ describe("IBAN", () => {
       expect(iban.getNationalCheckDigit()).toBe("79");
     });
 
+    it("RU", () => {
+      const iban = new IBAN("RU0204452560040702810412345678901");
+      expect(iban.getCountryCode()).toBe("RU");
+      expect(iban.getBankCode()).toBe("044525600");
+      expect(iban.getBranchCode()).toBe("40702");
+      expect(iban.getAccountNumber()).toBe("810412345678901");
+    });
+
     it("SA", () => {
       const iban = new IBAN("SA0380000000608010167519");
       expect(iban.getCountryCode()).toBe("SA");
@@ -533,6 +594,13 @@ describe("IBAN", () => {
       expect(iban.getBranchCode()).toBe("11");
       expect(iban.getBranchCheckDigit()).toBe("01");
       expect(iban.getAccountNumber()).toBe("0000000000001497");
+    });
+
+    it("SD", () => {
+      const iban = new IBAN("SD8811123456789012");
+      expect(iban.getCountryCode()).toBe("SD");
+      expect(iban.getBankCode()).toBe("11");
+      expect(iban.getAccountNumber()).toBe("123456789012");
     });
 
     it("SE", () => {
@@ -565,6 +633,14 @@ describe("IBAN", () => {
       expect(iban.getBankCode()).toBe("03225");
       expect(iban.getBranchCode()).toBe("09800");
       expect(iban.getAccountNumber()).toBe("000000270100");
+    });
+
+    it("SO", () => {
+      const iban = new IBAN("SO061000001123123456789");
+      expect(iban.getCountryCode()).toBe("SO");
+      expect(iban.getBankCode()).toBe("1000");
+      expect(iban.getBranchCode()).toBe("001");
+      expect(iban.getAccountNumber()).toBe("123123456789");
     });
 
     it("ST", () => {
@@ -650,11 +726,6 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("BF");
     });
 
-    it("BI", () => {
-      const iban = new IBAN("BI41123456789012");
-      expect(iban.getCountryCode()).toBe("BI");
-    });
-
     it("BJ", () => {
       const iban = new IBAN("BJ11B00610100400271101192591");
       expect(iban.getCountryCode()).toBe("BJ");
@@ -713,10 +784,11 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("MG");
     });
 
-    it("ML", () => {
-      const iban = new IBAN("ML15A12345678901234567890123");
-      expect(iban.getCountryCode()).toBe("ML");
-    });
+    // Conflicting information
+    // it("ML", () => {
+    //   const iban = new IBAN("ML1300016012010260010066849700");
+    //   expect(iban.getCountryCode()).toBe("ML");
+    // });
 
     it("MZ", () => {
       const iban = new IBAN("MZ25123456789012345678901");
@@ -744,11 +816,6 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("CG");
     });
 
-    it("EG", () => {
-      const iban = new IBAN("EG800002000156789012345180002");
-      expect(iban.getCountryCode()).toBe("EG");
-    });
-
     it("GA", () => {
       const iban = new IBAN("GA2140021010032001890020126");
       expect(iban.getCountryCode()).toBe("GA");
@@ -757,11 +824,6 @@ describe("IBAN", () => {
     it("MA", () => {
       const iban = new IBAN("MA64011519000001205000534921");
       expect(iban.getCountryCode()).toBe("MA");
-    });
-
-    it("NI", () => {
-      const iban = new IBAN("NI92BAMC000000000000000003123123");
-      expect(iban.getCountryCode()).toBe("NI");
     });
 
     it("NE", () => {
@@ -805,27 +867,19 @@ describe("IBAN", () => {
 
   describe("iban-js compatibility", () => {
     it("printFormat", () => {
-      expect(IBAN.printFormat("FR1420041010050500013M02606")).toBe(
-        "FR14 2004 1010 0505 0001 3M02 606",
-      );
+      expect(IBAN.printFormat("FR1420041010050500013M02606")).toBe("FR14 2004 1010 0505 0001 3M02 606");
     });
 
     it("electronicFormat", () => {
-      expect(IBAN.electronicFormat(" FR14*2&004 1010050500013M02606*")).toBe(
-        "FR1420041010050500013M02606",
-      );
+      expect(IBAN.electronicFormat(" FR14*2&004 1010050500013M02606*")).toBe("FR1420041010050500013M02606");
     });
 
     it("toBBAN", () => {
-      expect(IBAN.toBBAN(" FR142004 1010050500013M02606*")).toBe(
-        "20041 01005 0500013M026 06",
-      );
+      expect(IBAN.toBBAN(" FR142004 1010050500013M02606*")).toBe("20041 01005 0500013M026 06");
     });
 
     it("fromBBAN", () => {
-      expect(IBAN.fromBBAN("FR", "20041010050500013M02606")).toBe(
-        "FR1420041010050500013M02606",
-      );
+      expect(IBAN.fromBBAN("FR", "20041010050500013M02606")).toBe("FR1420041010050500013M02606");
     });
 
     it("isValidBBAN", () => {
