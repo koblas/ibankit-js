@@ -2,8 +2,9 @@
   "name": "ibankit",
   "version": "1.6.1",
   "description": "Validation, field extraction and creation of IBAN, BBAN, BIC numbers",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/cjs/index.d.ts",
   "keywords": [
     "IBAN",
     "BBAN",
@@ -36,7 +37,7 @@
   },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "test": "jest",
     "build": "tsc",
     "prepublishOnly:esm": "tsc -p tsconfig.json",
@@ -47,7 +48,7 @@
     "type": "git",
     "url": "https://github.com/koblas/ibankit.git"
   },
-  "author": "",
+  "author": "David Koblas",
   "license": "ISC",
   "homepage": "https://github.com/koblas/ibankit",
   "jest": {
@@ -57,7 +58,7 @@
       "js"
     ],
     "transform": {
-      "\\.(ts|tsx)$": "ts-jest"
+      "^.+\\.(ts|tsx)$": "ts-jest"
     },
     "testMatch": [
       "/test/.*\\.(ts|tsx|js)$",
