@@ -39,12 +39,7 @@ export class FormatException extends Error {
 
   expected?: string;
 
-  constructor(
-    formatViolation: FormatViolation,
-    msg: string,
-    expected?: string,
-    actual?: string,
-  ) {
+  constructor(formatViolation: FormatViolation, msg: string, expected?: string, actual?: string) {
     super(msg);
 
     this.formatViolation = formatViolation;

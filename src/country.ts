@@ -510,15 +510,21 @@ const countryData: Record<CountryCode, [string, string]> = {
   [CountryCode.ZW]: ["Zimbabwe", "ZWE"],
 };
 
-const by2code = Object.entries(countryData).reduce((acc, [k, v]) => {
-  acc[k] = [k as CountryCode, v];
-  return acc;
-}, {} as Record<string, [CountryCode, [string, string]]>);
+const by2code = Object.entries(countryData).reduce(
+  (acc, [k, v]) => {
+    acc[k] = [k as CountryCode, v];
+    return acc;
+  },
+  {} as Record<string, [CountryCode, [string, string]]>,
+);
 
-const by3code = Object.entries(countryData).reduce((acc, [k, v]) => {
-  acc[v[1]] = [k as CountryCode, v];
-  return acc;
-}, {} as Record<string, [CountryCode, [string, string]]>);
+const by3code = Object.entries(countryData).reduce(
+  (acc, [k, v]) => {
+    acc[v[1]] = [k as CountryCode, v];
+    return acc;
+  },
+  {} as Record<string, [CountryCode, [string, string]]>,
+);
 
 export function countryByCode(code: string): CountryCode | null {
   if (code === null) {
