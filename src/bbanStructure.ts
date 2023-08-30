@@ -1,7 +1,6 @@
 import { CharacterType, BbanStructurePart, PartType } from "./structurePart";
 import { CountryCode } from "./country";
 import { FormatException, FormatViolation, RequiredPartTypeMissing } from "./exceptions";
-import { objectEntries, objectValues } from "./poly";
 
 /**
  * MOD11 check digit computation
@@ -50,7 +49,7 @@ function nationalFR(bban: string, structure: BbanStructure) {
     [PartType.BANK_CODE, PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]
       .map((p) => String(structure.extractValue(bban, p)))
       .join("") + "00";
-  objectEntries(replaceChars).map(([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)));
+  Object.entries(replaceChars).map(([k, v]) => (combined = combined.replace(new RegExp(k, "g"), v)));
 
   // Number is bigger than max integer, take the mod%97 by hand
   const expected = 97 - combined.split("").reduce((acc, v) => (acc * 10 + parseInt(v)) % 97, 0);
@@ -847,11 +846,11 @@ export class BbanStructure {
     if (!countryCode) {
       return null;
     }
-    return this.structures[countryCode] || null;
+    return this.structures[countryCode as CountryCode] || null;
   }
 
   static getEntries(): BbanStructure[] {
-    return objectValues(this.structures) as BbanStructure[];
+    return Object.values(this.structures) as BbanStructure[];
   }
 
   static supportedCountries(): CountryCode[] {

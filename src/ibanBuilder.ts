@@ -11,13 +11,21 @@ import { IBAN } from "./iban";
  */
 export class IBANBuilder {
   private countryCodeValue?: CountryCode;
+
   private bankCodeValue?: string;
+
   private branchCodeValue?: string;
+
   private nationalCheckDigitValue?: string;
+
   private accountTypeValue?: string;
+
   private accountNumberValue?: string;
+
   private ownerAccountTypeValue?: string;
+
   private identificationNumberValue?: string;
+
   private branchCheckDigitValue?: string;
 
   /**

@@ -1,15 +1,25 @@
 module.exports = {
   root: true,
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "import"],
-  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "airbnb-typescript/base", "prettier"],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'prettier'],
+  extends: [
+    'airbnb-typescript/base',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
+    'prettier',
+  ],
   parserOptions: {
-    project: "./tsconfig.json",
+    project: './tsconfig-lint.json',
+    ecmaVersion: 2020,
+    sourceType: 'module',
+  },
+  env: {
+    es6: true,
+    browser: true,
+    node: true,
   },
   rules: {
-    "lines-between-class-members": "off",
-    "@typescript-eslint/lines-between-class-members": "off",
-    "no-inferrable-types": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
+    'import/prefer-default-export': 'off',
+    'no-console': 'error',
   },
 };

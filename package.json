@@ -16,11 +16,32 @@
     "lib",
     "src"
   ],
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ]
+  },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly:esm": "tsc -p tsconfig.json",
+    "prepublishOnly:cjs": "tsc -p tsconfig-cjs.json",
+    "prepublishOnly": "npm run prepublishOnly:esm && npm run prepublishOnly:cjs"
   },
   "repository": {
     "type": "git",
@@ -38,21 +59,27 @@
     "transform": {
       "\\.(ts|tsx)$": "ts-jest"
     },
-    "testRegex": "/test/.*\\.(ts|tsx|js)$"
+    "testMatch": [
+      "/test/.*\\.(ts|tsx|js)$",
+      "**/__tests__/**/*.+(ts|tsx|js)",
+      "**/?(*.)+(spec|test).+(ts|tsx|js)"
+    ]
   },
   "devDependencies": {
-    "@types/jest": "^27.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-airbnb-typescript": "^14.0.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.24.2",
-    "handlebars": "^4.7.7",
-    "jest": "^27.1.0",
-    "prettier": "^2.4.1",
-    "ts-jest": "^27.0.5",
-    "typescript": "^4.4.3"
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@types/jest": "^29.5.4",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.6.4",
+    "prettier": "^3.0.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
   }
 }
