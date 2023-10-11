@@ -527,10 +527,10 @@ describe("IBAN", () => {
     it("PL", () => {
       const iban = new IBAN("PL61109010140000071219812874");
       expect(iban.getCountryCode()).toBe("PL");
-      expect(iban.getBankCode()).toBe("109");
-      expect(iban.getBranchCode()).toBe("0101");
+      expect(iban.getBankCode()).toBe("10901014");
       expect(iban.getAccountNumber()).toBe("0000071219812874");
-      expect(iban.getNationalCheckDigit()).toBe("4");
+      expect(iban.getBranchCode()).toBe("");
+      expect(iban.getNationalCheckDigit()).toBe("");
     });
 
     it("PS", () => {

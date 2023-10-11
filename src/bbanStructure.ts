@@ -623,9 +623,7 @@ export class BbanStructure {
 
     // 8!n16!n
     [CountryCode.PL]: new BbanStructure(
-      BbanStructurePart.bankCode(3, CharacterType.n),
-      BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.bankCode(8, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.n),
     ),
 
