@@ -529,8 +529,8 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("PL");
       expect(iban.getBankCode()).toBe("10901014");
       expect(iban.getAccountNumber()).toBe("0000071219812874");
-      expect(iban.getBranchCode()).toBe("");
-      expect(iban.getNationalCheckDigit()).toBe("");
+      expect(iban.getBranchCode()).toBe(null);
+      expect(iban.getNationalCheckDigit()).toBe(null);
     });
 
     it("PS", () => {
