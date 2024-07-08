@@ -64,8 +64,8 @@ function validateCase(bic: string) {
 function validateBankCode(bic: string) {
   const bankCode = getBankCode(bic);
 
-  if (!ucRegex.test(bankCode)) {
-    throw new FormatException(FormatViolation.BANK_CODE_ONLY_LETTERS, "Bank code must contain only letters.", bankCode);
+  if (!ucnumRegex.test(bankCode)) {
+    throw new FormatException(FormatViolation.BANK_CODE_ONLY_LETTERS, "Bank code must contain only letters or digits.", bankCode);
   }
 }
 
