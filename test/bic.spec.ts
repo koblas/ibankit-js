@@ -26,6 +26,12 @@ describe("BIC", () => {
       expect(bic.getBankCode()).toBe("DEUT");
     });
 
+    it("bank code alphanum", () => {
+      const bic = new BIC("E097AEXXXXX");
+
+      expect(bic.getBankCode()).toBe("E097");
+    });
+
     it("country code", () => {
       const bic = new BIC("DEUTDEFF500");
 
