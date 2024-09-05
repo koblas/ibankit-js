@@ -555,7 +555,7 @@ export class BbanStructure {
     // Provisional
     [CountryCode.ML]: new BbanStructure(
       BbanStructurePart.bankCode(1, CharacterType.a),
-      BbanStructurePart.accountNumber(25, CharacterType.n),
+      BbanStructurePart.accountNumber(23, CharacterType.n),
     ),
 
     [CountryCode.MN]: new BbanStructure(
