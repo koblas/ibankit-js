@@ -616,6 +616,11 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalNO),
     ),
 
+    [CountryCode.OM]: new BbanStructure(
+      BbanStructurePart.bankCode(3, CharacterType.n),
+      BbanStructurePart.accountNumber(16, CharacterType.n),
+    ),
+
     [CountryCode.PK]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.c),
       BbanStructurePart.accountNumber(16, CharacterType.c),
