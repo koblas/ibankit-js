@@ -1,6 +1,6 @@
 {
   "name": "ibankit",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Validation, field extraction and creation of IBAN, BBAN, BIC numbers",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
