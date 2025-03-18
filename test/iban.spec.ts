@@ -517,6 +517,14 @@ describe("IBAN", () => {
       expect(iban.getNationalCheckDigit()).toBe("7");
     });
 
+    it("OM", () => {
+      const iban = new IBAN("OM770180010080577149017");
+      expect(iban.getCountryCode()).toBe("OM");
+      expect(iban.getBankCode()).toBe("018");
+      expect(iban.getAccountNumber()).toBe("0010080577149017");
+
+    });
+
     it("PK", () => {
       const iban = new IBAN("PK36SCBL0000001123456702");
       expect(iban.getCountryCode()).toBe("PK");
