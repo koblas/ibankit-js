@@ -584,7 +584,7 @@ export class BbanStructure {
     [CountryCode.MU]: new BbanStructure(
       BbanStructurePart.bankCode(6, CharacterType.c), // 4!a2!n
       BbanStructurePart.branchCode(2, CharacterType.n),
-      BbanStructurePart.accountNumber(12, CharacterType.c),
+      BbanStructurePart.accountNumber(12, CharacterType.n),
       BbanStructurePart.accountType(3, CharacterType.n),
       BbanStructurePart.currencyType(3, CharacterType.a),
     ),
