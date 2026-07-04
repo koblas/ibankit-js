@@ -11,6 +11,14 @@ describe("IBAN", () => {
     it("bad iban", () => {
       expect(IBAN.isValid("BA391990440001200278")).toBe(false);
     });
+    it("MU account number must be numeric (12!n)", () => {
+      // SWIFT IBAN Registry MU BBAN structure is 4!a2!n2!n12!n3!n3!a; the
+      // account number is 12 digits. A letter in that field is structurally
+      // invalid even when the check digits are correct (mod-97 == 1 here).
+      expect(IBAN.isValid("MU84BOMM010110103030020A000MUR")).toBe(false);
+      // Genuine registry example stays valid.
+      expect(IBAN.isValid("MU17BOMM0101101030300200000MUR")).toBe(true);
+    });
   });
 
   describe("Test check digit", () => {
