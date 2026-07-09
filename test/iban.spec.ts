@@ -886,6 +886,10 @@ describe("IBAN", () => {
       expect(IBAN.printFormat("FR1420041010050500013M02606")).toBe("FR14 2004 1010 0505 0001 3M02 606");
     });
 
+    it("printFormat with a non-space separator", () => {
+      expect(IBAN.printFormat("BE68539007547034", "-")).toBe("BE68-5390-0754-7034");
+    });
+
     it("electronicFormat", () => {
       expect(IBAN.electronicFormat(" FR14*2&004 1010050500013M02606*")).toBe("FR1420041010050500013M02606");
     });
