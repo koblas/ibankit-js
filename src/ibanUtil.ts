@@ -274,7 +274,7 @@ export function replaceCheckDigit(iban: string, checkDigit: string): string {
  * @return A string representing formatted Iban for printing.
  */
 export function toFormattedString(iban: string, separator: string = " "): string {
-  return iban.replace(/(.{4})/g, `$1${separator}`).trim();
+  return iban.replace(/(.{4})(?!$)/g, `$1${separator}`).trim();
 }
 
 /* Returns formatted version of BBAN from IBAN.
