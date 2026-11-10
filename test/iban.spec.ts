@@ -810,7 +810,7 @@ describe("IBAN", () => {
     });
 
     it("MG", () => {
-      const iban = new IBAN("MG1812345678901234567890123");
+      const iban = new IBAN("MG4600005000414382396020068") // ONG Bel Avenir (BNI), ongbelavenir.org;
       expect(iban.getCountryCode()).toBe("MG");
     });
 

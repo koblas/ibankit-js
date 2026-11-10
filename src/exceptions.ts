@@ -30,6 +30,8 @@ export enum FormatViolation {
   COUNTRY_CODE_NOT_NULL,
   BANK_CODE_NOT_NULL,
   ACCOUNT_NUMBER_NOT_NULL,
+
+  BRANCH_CHECK_DIGIT,
 }
 
 export class FormatException extends Error {

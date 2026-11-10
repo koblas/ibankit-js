@@ -11,6 +11,47 @@ function mod11(value: string, weights: number[]) {
   );
 }
 
+/**
+ * Weighted MOD10 check digit: (10 - sum(digit * weight) mod 10) mod 10, with
+ * the weights applied from the left and repeated as needed.
+ */
+function mod10(value: string, weights: number[]) {
+  return String(
+    (10 - (value.split("").reduce((acc, s, idx) => acc + parseInt(s, 10) * weights[idx % weights.length], 0) % 10)) %
+      10,
+  );
+}
+
+function joinParts(bban: string, structure: BbanStructure, parts: PartType[]) {
+  return parts.map((p) => structure.extractValueMust(bban, p)).join("");
+}
+
+// Albania: bank code + branch code, weights 9, 7, 3, 1
+function nationalAL(bban: string, structure: BbanStructure) {
+  return mod10(joinParts(bban, structure, [PartType.BANK_CODE, PartType.BRANCH_CODE]), [9, 7, 3, 1]);
+}
+
+// Estonia: branch code + account number (not the bank code), weights 7, 1, 3
+function nationalEE(bban: string, structure: BbanStructure) {
+  return mod10(joinParts(bban, structure, [PartType.BRANCH_CODE, PartType.ACCOUNT_NUMBER]), [7, 1, 3]);
+}
+
+// Hungary: bank code + branch code, weights 9, 7, 3, 1
+function branchHU(bban: string, structure: BbanStructure) {
+  return mod10(joinParts(bban, structure, [PartType.BANK_CODE, PartType.BRANCH_CODE]), [9, 7, 3, 1]);
+}
+
+// Hungary: account number, weights 9, 7, 3, 1. For 16 digit (8+8) accounts the
+// last 8 digits are zeros and this digit is 0 exactly when the second block is valid.
+function nationalHU(bban: string, structure: BbanStructure) {
+  return mod10(joinParts(bban, structure, [PartType.ACCOUNT_NUMBER]), [9, 7, 3, 1]);
+}
+
+// Poland: bank code + branch code, weights 3, 9, 7, 1
+function nationalPL(bban: string, structure: BbanStructure) {
+  return mod10(joinParts(bban, structure, [PartType.BANK_CODE, PartType.BRANCH_CODE]), [3, 9, 7, 1]);
+}
+
 function nationalES(bban: string, structure: BbanStructure) {
   const weights = [1, 2, 4, 8, 5, 10, 9, 7, 3, 6];
   const combined = [PartType.BANK_CODE, PartType.BRANCH_CODE].map((p) => structure.extractValueMust(bban, p)).join("");
@@ -97,7 +138,7 @@ function nationalPT(bban: string, structure: BbanStructure) {
 
 /**
  * ISO 7064 MOD 97-10 over the whole BBAN (minus the check digits), as used by
- * BA, ME, MK, RS, SI and TL: check = 98 - (bban * 100 mod 97).
+ * BA, ME, MK, RS, SI, TL and XK: check = 98 - (bban * 100 mod 97).
  *
  * Letters (only possible in MK's 10!c account number) are expanded the same
  * way as in the IBAN check (ISO 13616): A=10 ... Z=35.
@@ -152,7 +193,7 @@ export class BbanStructure {
     [CountryCode.AL]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalAL),
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
@@ -321,7 +362,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     // Registry defines 4!n9!n1!n -- however no information on
@@ -347,7 +388,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalEE),
     ),
 
     [CountryCode.EG]: new BbanStructure(
@@ -448,9 +489,9 @@ export class BbanStructure {
     [CountryCode.HU]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.branchCheckDigit(1, CharacterType.n),
+      BbanStructurePart.branchCheckDigit(1, CharacterType.n, branchHU),
       BbanStructurePart.accountNumber(15, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalHU),
     ),
 
     [CountryCode.IE]: new BbanStructure(
@@ -575,7 +616,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     [CountryCode.MK]: new BbanStructure(
@@ -603,7 +644,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(11, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     [CountryCode.MT]: new BbanStructure(
@@ -675,7 +716,7 @@ export class BbanStructure {
     [CountryCode.PL]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(4, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n, nationalPL),
       BbanStructurePart.accountNumber(16, CharacterType.n),
     ),
 
@@ -812,7 +853,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(13, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
     [CountryCode.TR]: new BbanStructure(
@@ -841,7 +882,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     [CountryCode.YE]: new BbanStructure(
@@ -984,6 +1025,19 @@ export class BbanStructure {
         throw new FormatException(
           FormatViolation.NATIONAL_CHECK_DIGIT,
           `national check digit(s) don't match expect=[${expected}] actual=[${entryValue}]`,
+          expected,
+          entryValue,
+        );
+      }
+    }
+
+    if (part.getPartType() === PartType.BRANCH_CHECK_DIGIT && part.hasGenerator) {
+      const expected = part.generate(bban, this);
+
+      if (entryValue !== expected) {
+        throw new FormatException(
+          FormatViolation.BRANCH_CHECK_DIGIT,
+          `branch check digit(s) don't match expect=[${expected}] actual=[${entryValue}]`,
           expected,
           entryValue,
         );
