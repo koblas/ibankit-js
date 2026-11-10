@@ -12,21 +12,9 @@ import { IBAN } from "./iban";
 export class IBANBuilder {
   private countryCodeValue?: CountryCode;
 
-  private bankCodeValue?: string;
-
-  private branchCodeValue?: string;
-
-  private nationalCheckDigitValue?: string;
-
-  private accountTypeValue?: string;
-
-  private accountNumberValue?: string;
-
-  private ownerAccountTypeValue?: string;
-
-  private identificationNumberValue?: string;
-
-  private branchCheckDigitValue?: string;
+  // Values by part type. A part type may span several consecutive structure
+  // parts (e.g. a 4!a2!n bank code); its value then covers all of them.
+  private values: Partial<Record<PartType, string>> = {};
 
   /**
    * Creates an Iban Builder instance.
@@ -51,7 +39,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   bankCode(bankCode: string): IBANBuilder {
-    this.bankCodeValue = bankCode;
+    this.values[PartType.BANK_CODE] = bankCode;
     return this;
   }
 
@@ -62,7 +50,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   branchCode(branchCode: string): IBANBuilder {
-    this.branchCodeValue = branchCode;
+    this.values[PartType.BRANCH_CODE] = branchCode;
     return this;
   }
 
@@ -73,7 +61,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   accountNumber(accountNumber: string): IBANBuilder {
-    this.accountNumberValue = accountNumber;
+    this.values[PartType.ACCOUNT_NUMBER] = accountNumber;
     return this;
   }
 
@@ -84,7 +72,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   nationalCheckDigit(nationalCheckDigit: string): IBANBuilder {
-    this.nationalCheckDigitValue = nationalCheckDigit;
+    this.values[PartType.NATIONAL_CHECK_DIGIT] = nationalCheckDigit;
     return this;
   }
 
@@ -95,7 +83,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   branchCheckDigit(branchCheckDigit: string): IBANBuilder {
-    this.branchCheckDigitValue = branchCheckDigit;
+    this.values[PartType.BRANCH_CHECK_DIGIT] = branchCheckDigit;
     return this;
   }
 
@@ -106,7 +94,18 @@ export class IBANBuilder {
    * @return builder Builder
    */
   accountType(accountType: string): IBANBuilder {
-    this.accountTypeValue = accountType;
+    this.values[PartType.ACCOUNT_TYPE] = accountType;
+    return this;
+  }
+
+  /**
+   * Sets iban's currency type.
+   *
+   * @param currencyType String
+   * @return builder Builder
+   */
+  currencyType(currencyType: string): IBANBuilder {
+    this.values[PartType.CURRENCY_TYPE] = currencyType;
     return this;
   }
 
@@ -117,7 +116,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   ownerAccountType(ownerAccountType: string): IBANBuilder {
-    this.ownerAccountTypeValue = ownerAccountType;
+    this.values[PartType.OWNER_ACCOUNT_NUMBER] = ownerAccountType;
     return this;
   }
 
@@ -128,7 +127,7 @@ export class IBANBuilder {
    * @return builder Builder
    */
   identificationNumber(identificationNumber: string): IBANBuilder {
-    this.identificationNumberValue = identificationNumber;
+    this.values[PartType.IDENTIFICATION_NUMBER] = identificationNumber;
     return this;
   }
 
@@ -170,63 +169,45 @@ export class IBANBuilder {
     return new IBAN(ibanValue);
   }
 
-  /**
-   * Returns formatted bban string.
-   */
-  private formatBban(): string {
-    const parts: string[] = [];
+  // Setter names, for error messages
+  private static readonly NAMES: Record<PartType, string> = {
+    [PartType.BANK_CODE]: "bankCode",
+    [PartType.BRANCH_CODE]: "branchCode",
+    [PartType.ACCOUNT_NUMBER]: "accountNumber",
+    [PartType.BRANCH_CHECK_DIGIT]: "branchCheckDigit",
+    [PartType.NATIONAL_CHECK_DIGIT]: "nationalCheckDigit",
+    [PartType.CURRENCY_TYPE]: "currencyType",
+    [PartType.ACCOUNT_TYPE]: "accountType",
+    [PartType.OWNER_ACCOUNT_NUMBER]: "ownerAccountType",
+    [PartType.IDENTIFICATION_NUMBER]: "identificationNumber",
+  };
+
+  private getStructure(): BbanStructure {
     const structure = BbanStructure.forCountry(this.countryCodeValue);
 
     if (structure === null) {
       throw new UnsupportedCountryException("Country code is not supported.", this.countryCodeValue);
     }
 
-    for (const part of structure.getParts()) {
-      switch (part.getPartType()) {
-        case PartType.BANK_CODE:
-          if (typeof this.bankCodeValue === "string") {
-            parts.push(this.bankCodeValue);
-          }
-          break;
-        case PartType.BRANCH_CODE:
-          if (typeof this.branchCodeValue === "string") {
-            parts.push(this.branchCodeValue);
-          }
-          break;
-        case PartType.BRANCH_CHECK_DIGIT:
-          if (typeof this.branchCheckDigitValue === "string") {
-            parts.push(this.branchCheckDigitValue);
-          }
-          break;
-        case PartType.ACCOUNT_NUMBER:
-          if (typeof this.accountNumberValue === "string") {
-            parts.push(this.accountNumberValue);
-          }
-          break;
-        case PartType.NATIONAL_CHECK_DIGIT:
-          if (typeof this.nationalCheckDigitValue === "string") {
-            parts.push(this.nationalCheckDigitValue);
-          }
-          break;
-        case PartType.ACCOUNT_TYPE:
-          if (typeof this.accountTypeValue === "string") {
-            parts.push(this.accountTypeValue);
-          }
-          break;
-        case PartType.OWNER_ACCOUNT_NUMBER:
-          if (typeof this.ownerAccountTypeValue === "string") {
-            parts.push(this.ownerAccountTypeValue);
-          }
-          break;
-        case PartType.IDENTIFICATION_NUMBER:
-          if (typeof this.identificationNumberValue === "string") {
-            parts.push(this.identificationNumberValue);
-          }
-          break;
-      }
-    }
+    return structure;
+  }
 
-    return parts.join("");
+  /**
+   * The distinct part types of the structure, in BBAN order.
+   */
+  private static partTypes(structure: BbanStructure): PartType[] {
+    return [...new Set(structure.getParts().map((p) => p.getPartType()))];
+  }
+
+  /**
+   * Returns formatted bban string.
+   */
+  private formatBban(): string {
+    const structure = this.getStructure();
+
+    return IBANBuilder.partTypes(structure)
+      .map((partType) => this.values[partType] ?? "")
+      .join("");
   }
 
   /**
@@ -237,80 +218,37 @@ export class IBANBuilder {
   }
 
   private fillMissingFieldsRandomly(fillRandom: boolean) {
-    const structure = BbanStructure.forCountry(this.countryCodeValue);
-
-    if (structure == null) {
-      throw new UnsupportedCountryException("Country code is not supported.", this.countryCodeValue);
-    }
-
+    const structure = this.getStructure();
     let needCheckDigit = false;
 
-    for (const entry of structure.getParts()) {
-      switch (entry.getPartType()) {
-        case PartType.BANK_CODE:
-          if (!this.bankCodeValue) {
-            this.bankCodeValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "bankCode is required; it cannot be null");
-          }
-          break;
-        case PartType.BRANCH_CODE:
-          if (!this.branchCodeValue) {
-            this.branchCodeValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "branchCode is required; it cannot be null");
-          }
-          break;
-        case PartType.BRANCH_CHECK_DIGIT:
-          if (!this.branchCheckDigitValue) {
-            this.branchCheckDigitValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "branchCheckDigit is required; it cannot be null");
-          }
-          break;
-        case PartType.ACCOUNT_NUMBER:
-          if (!this.accountNumberValue) {
-            this.accountNumberValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "accountNumber is required; it cannot be null");
-          }
-          break;
-        case PartType.NATIONAL_CHECK_DIGIT:
-          if (!this.nationalCheckDigitValue) {
-            needCheckDigit = true;
-            this.nationalCheckDigitValue = "".padStart(entry.getLength(), "0");
-          }
-          break;
-        case PartType.ACCOUNT_TYPE:
-          if (!this.accountTypeValue) {
-            this.accountTypeValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "accountType is required; it cannot be null");
-          }
-          break;
-        case PartType.OWNER_ACCOUNT_NUMBER:
-          if (!this.ownerAccountTypeValue) {
-            this.ownerAccountTypeValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "ownerAccountType is required; it cannot be null");
-          }
-          break;
-        case PartType.IDENTIFICATION_NUMBER:
-          if (!this.identificationNumberValue) {
-            this.identificationNumberValue = entry.generate("", structure);
-          } else if (!fillRandom) {
-            throw new FormatException(FormatViolation.NOT_NULL, "indentificationNumber is required; it cannot be null");
-          }
-          break;
+    for (const partType of IBANBuilder.partTypes(structure)) {
+      if (this.values[partType]) {
+        continue;
+      }
+
+      const parts = structure.getParts().filter((p) => p.getPartType() === partType);
+
+      if (partType === PartType.NATIONAL_CHECK_DIGIT) {
+        // Computed below, once the rest of the BBAN is known
+        needCheckDigit = true;
+        this.values[partType] = "".padStart(
+          parts.reduce((acc, p) => acc + p.getLength(), 0),
+          "0",
+        );
+      } else if (fillRandom) {
+        this.values[partType] = parts.map((p) => p.generate("", structure)).join("");
+      } else {
+        throw new FormatException(
+          FormatViolation.NOT_NULL,
+          `${IBANBuilder.NAMES[partType]} is required; it cannot be null`,
+        );
       }
     }
 
     if (needCheckDigit) {
       for (const entry of structure.getParts()) {
         if (entry.getPartType() === PartType.NATIONAL_CHECK_DIGIT) {
-          const bban = this.formatBban();
-
-          this.nationalCheckDigitValue = entry.generate(bban, structure);
+          this.values[PartType.NATIONAL_CHECK_DIGIT] = entry.generate(this.formatBban(), structure);
         }
       }
     }

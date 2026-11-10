@@ -288,7 +288,16 @@ export function toFormattedStringBBAN(iban: string, separator = " "): string {
   }
 
   const bban = getBban(iban);
-  const parts = structure.getParts().reduce((acc, part) => {
+  const structureParts = structure.getParts();
+  const parts = structureParts.reduce((acc, part, idx) => {
+    const next = structureParts[idx + 1];
+
+    // A part type split over consecutive parts (e.g. a 4!a2!n bank code) is
+    // printed once, with the separator of its last part.
+    if (next && next.getPartType() === part.getPartType()) {
+      return acc;
+    }
+
     const value = structure.extractValue(bban, part.getPartType());
 
     return acc.concat(value || "", part.trailingSeparator ? separator : "");

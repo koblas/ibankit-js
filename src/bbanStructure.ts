@@ -451,9 +451,12 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(19, CharacterType.n),
     ),
 
+    // IS2!n4!n2!n6!n10!n: bank 2, branch 2, ledger ("hofudbok") 2, account 6,
+    // kennitala (national ID) 10
     [CountryCode.IS]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.n),
+      BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(2, CharacterType.n),
+      BbanStructurePart.accountType(2, CharacterType.n, true),
       BbanStructurePart.accountNumber(6, CharacterType.n),
       BbanStructurePart.identificationNumber(10, CharacterType.n),
     ),
@@ -588,7 +591,9 @@ export class BbanStructure {
     //  No docs on the last 3!n -- assuming account type
     //  all found IBANs have '000'
     [CountryCode.MU]: new BbanStructure(
-      BbanStructurePart.bankCode(6, CharacterType.c), // 4!a2!n
+      // Bank identifier 4!a2!n
+      BbanStructurePart.bankCode(4, CharacterType.a, false),
+      BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountNumber(12, CharacterType.n),
       BbanStructurePart.accountType(3, CharacterType.n),
@@ -690,10 +695,11 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(18, CharacterType.c),
     ),
 
+    // SC2!n4!a2!n2!n16!n3!a: bank identifier 4!a2!n, branch 2!n
     [CountryCode.SC]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.bankCode(4, CharacterType.a, false),
+      BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(2, CharacterType.n),
-      BbanStructurePart.branchCheckDigit(2, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.n),
       BbanStructurePart.currencyType(3, CharacterType.a),
     ),
