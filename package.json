@@ -19,24 +19,6 @@
     "lib",
     "src"
   ],
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/npm",
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "package.json"
-          ],
-          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-        }
-      ]
-    ]
-  },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
@@ -44,15 +26,19 @@
     "build": "tsc",
     "prepublishOnly:esm": "tsc -p tsconfig.json",
     "prepublishOnly:cjs": "tsc -p tsconfig-cjs.json",
-    "prepublishOnly": "npm run prepublishOnly:esm && npm run prepublishOnly:cjs"
+    "prepublishOnly": "npm run prepublishOnly:esm && npm run prepublishOnly:cjs",
+    "lint:package": "publint --level error && attw --pack ."
+  },
+  "publishConfig": {
+    "provenance": true
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/koblas/ibankit.git"
+    "url": "git+https://github.com/koblas/ibankit-js.git"
   },
   "author": "David Koblas",
   "license": "ISC",
-  "homepage": "https://github.com/koblas/ibankit",
+  "homepage": "https://github.com/koblas/ibankit-js",
   "jest": {
     "moduleFileExtensions": [
       "ts",
@@ -69,8 +55,7 @@
     ]
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
+    "@arethetypeswrong/cli": "^0.18.5",
     "@types/jest": "^29.5.4",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
@@ -82,6 +67,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.6.4",
     "prettier": "^3.0.3",
+    "publint": "^0.3.25",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   }
