@@ -1,4 +1,5 @@
 import { IBAN, BbanStructure } from "../src";
+import { FormatViolation } from "../src/exceptions";
 
 describe("IBAN", () => {
   describe("test IBAN.isValid", () => {
@@ -22,6 +23,24 @@ describe("IBAN", () => {
     it("MU bank code is 4!a2!n", () => {
       expect(IBAN.isValid("MU52BOM10101101030300200000MUR")).toBe(false);
       expect(IBAN.isValid("MU93BOMMA101101030300200000MUR")).toBe(false);
+    });
+    it("OM account number is alphanumeric (16!c)", () => {
+      expect(IBAN.isValid("OM0501800000B1299123456")).toBe(true);
+      expect(IBAN.isValid("OM810180000001299123456")).toBe(true);
+    });
+    it("check digits 00, 01 and 99 are out of range", () => {
+      // Each pair satisfies mod 97 == 1; only the 02..98 form is valid.
+      expect(IBAN.isValid("DE97703622007235483551")).toBe(true);
+      expect(IBAN.isValid("DE00703622007235483551")).toBe(false);
+      expect(IBAN.isValid("DE98687914731930171162")).toBe(true);
+      expect(IBAN.isValid("DE01687914731930171162")).toBe(false);
+      expect(IBAN.isValid("DE02032626559638338458")).toBe(true);
+      expect(IBAN.isValid("DE99032626559638338458")).toBe(false);
+    });
+    it("out of range check digit reports CHECK_DIGIT_RANGE", () => {
+      expect(() => new IBAN("DE00703622007235483551")).toThrow(
+        expect.objectContaining({ formatViolation: FormatViolation.CHECK_DIGIT_RANGE }),
+      );
     });
   });
 

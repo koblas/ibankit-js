@@ -801,7 +801,8 @@ export class BbanStructure {
     ),
     /**
      * According to the SWIFT IBAN registry, the Account Number length for Oman is specified as 16!c.
-     * However, the Central Bank of Oman specifies it as 16!n.
+     * The Central Bank of Oman specifies it as 16!n. Follow the registry: it is the authoritative
+     * source and accepting the wider character set avoids rejecting registry-valid IBANs.
      *
      * References:
      * - SWIFT IBAN Registry (16!c since Release 99, Dec 2024; unchanged Sep 2026):
@@ -811,7 +812,7 @@ export class BbanStructure {
      */
     [CountryCode.OM]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(16, CharacterType.n),
+      BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
     [CountryCode.PK]: new BbanStructure(

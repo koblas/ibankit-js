@@ -385,6 +385,17 @@ function validateCheckDigitPresence(iban: string) {
       checkDigit,
     );
   }
+
+  // ISO 13616 check digits are in the range 02..98. 00, 01 and 99 are
+  // congruent to 97, 98 and 02 so they would otherwise pass the mod 97 test.
+  const value = parseInt(checkDigit, 10);
+  if (value < 2 || value > 98) {
+    throw new FormatException(
+      FormatViolation.CHECK_DIGIT_RANGE,
+      "Iban's check digit must be between 02 and 98.",
+      checkDigit,
+    );
+  }
 }
 
 /**
