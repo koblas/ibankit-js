@@ -81,16 +81,31 @@ export class BbanStructurePart {
     this.trailingSeparator = trailingSeparator;
   }
 
-  static bankCode(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
-    return new BbanStructurePart(PartType.BANK_CODE, characterType, length, trailingSeparator);
+  static bankCode(
+    length: number,
+    characterType: CharacterType,
+    trailingSeparator = true,
+    generate?: GenerateValue,
+  ): BbanStructurePart {
+    return new BbanStructurePart(PartType.BANK_CODE, characterType, length, trailingSeparator, generate);
   }
 
-  static branchCode(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
-    return new BbanStructurePart(PartType.BRANCH_CODE, characterType, length, trailingSeparator);
+  static branchCode(
+    length: number,
+    characterType: CharacterType,
+    trailingSeparator = true,
+    generate?: GenerateValue,
+  ): BbanStructurePart {
+    return new BbanStructurePart(PartType.BRANCH_CODE, characterType, length, trailingSeparator, generate);
   }
 
-  static accountNumber(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
-    return new BbanStructurePart(PartType.ACCOUNT_NUMBER, characterType, length, trailingSeparator);
+  static accountNumber(
+    length: number,
+    characterType: CharacterType,
+    trailingSeparator = true,
+    generate?: GenerateValue,
+  ): BbanStructurePart {
+    return new BbanStructurePart(PartType.ACCOUNT_NUMBER, characterType, length, trailingSeparator, generate);
   }
 
   static nationalCheckDigit(
@@ -127,8 +142,9 @@ export class BbanStructurePart {
     length: number,
     characterType: CharacterType,
     trailingSeparator = true,
+    generate?: GenerateValue,
   ): BbanStructurePart {
-    return new BbanStructurePart(PartType.IDENTIFICATION_NUMBER, characterType, length, trailingSeparator);
+    return new BbanStructurePart(PartType.IDENTIFICATION_NUMBER, characterType, length, trailingSeparator, generate);
   }
 
   getPartType(): PartType {
