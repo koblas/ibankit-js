@@ -219,7 +219,7 @@ export class IBANBuilder {
 
   private fillMissingFieldsRandomly(fillRandom: boolean) {
     const structure = this.getStructure();
-    let needCheckDigit = false;
+    const computed: PartType[] = [];
 
     for (const partType of IBANBuilder.partTypes(structure)) {
       if (this.values[partType]) {
@@ -228,9 +228,12 @@ export class IBANBuilder {
 
       const parts = structure.getParts().filter((p) => p.getPartType() === partType);
 
-      if (partType === PartType.NATIONAL_CHECK_DIGIT) {
+      if (
+        partType === PartType.NATIONAL_CHECK_DIGIT ||
+        (partType === PartType.BRANCH_CHECK_DIGIT && parts.every((p) => p.hasGenerator))
+      ) {
         // Computed below, once the rest of the BBAN is known
-        needCheckDigit = true;
+        computed.push(partType);
         this.values[partType] = "".padStart(
           parts.reduce((acc, p) => acc + p.getLength(), 0),
           "0",
@@ -245,10 +248,10 @@ export class IBANBuilder {
       }
     }
 
-    if (needCheckDigit) {
+    for (const partType of computed) {
       for (const entry of structure.getParts()) {
-        if (entry.getPartType() === PartType.NATIONAL_CHECK_DIGIT) {
-          this.values[PartType.NATIONAL_CHECK_DIGIT] = entry.generate(this.formatBban(), structure);
+        if (entry.getPartType() === partType) {
+          this.values[partType] = entry.generate(this.formatBban(), structure);
         }
       }
     }
