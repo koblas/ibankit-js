@@ -1,6 +1,7 @@
 import { CharacterType, BbanStructurePart, PartType } from "./structurePart";
 import { CountryCode } from "./country";
 import { FormatException, FormatViolation, RequiredPartTypeMissing } from "./exceptions";
+import { randInt } from "./randInt";
 
 /**
  * MOD11 check digit computation
@@ -160,6 +161,83 @@ function nationalMod97(bban: string, structure: BbanStructure) {
     .reduce((acc, v) => (acc * (v < 10 ? 10 : 100) + v) % 97, 0);
 
   return String(98 - remainder).padStart(2, "0");
+}
+
+/**
+ * Check of a check digit embedded in another part (no separate check digit
+ * part in the BBAN). Returns a description of the failure, or null.
+ */
+type BbanCheck = (bban: string, structure: BbanStructure) => string | null;
+
+function randomDigits(length: number) {
+  return Array.from({ length }, () => String(randInt(10))).join("");
+}
+
+/** Sum of digit * weight, weights aligned to the right of the value */
+function weightedSumRight(value: string, weights: number[]) {
+  const w = weights.slice(weights.length - value.length);
+  return value.split("").reduce((acc, s, idx) => acc + parseInt(s, 10) * w[idx], 0);
+}
+
+// Czech Republic / Slovakia: account prefix (6 digits) and account number
+// (10 digits) each have a weighted sum divisible by 11, last digit is the check.
+const WEIGHTS_CZ = [6, 3, 7, 9, 10, 5, 8, 4, 2, 1];
+
+function isValidCZ(value: string) {
+  return weightedSumRight(value, WEIGHTS_CZ) % 11 === 0;
+}
+
+function generateCZ(length: number) {
+  for (;;) {
+    const body = randomDigits(length - 1);
+    const check = (11 - (weightedSumRight(`${body}0`, WEIGHTS_CZ) % 11)) % 11;
+    if (check < 10) {
+      return `${body}${check}`;
+    }
+  }
+}
+
+function checkCZ(prefix: string, account: string) {
+  if (!isValidCZ(prefix)) {
+    return "account number prefix fails the mod 11 check";
+  }
+  if (!isValidCZ(account)) {
+    return "account number fails the mod 11 check";
+  }
+  return null;
+}
+
+// Finland: Luhn over the whole BBAN, the last digit is the check
+function luhn(digits: string) {
+  const sum = digits
+    .split("")
+    .reverse()
+    .reduce((acc, s, idx) => {
+      const v = parseInt(s, 10) * (idx % 2 === 0 ? 2 : 1);
+      return acc + (v > 9 ? v - 9 : v);
+    }, 0);
+  return (10 - (sum % 10)) % 10;
+}
+
+// Croatia: ISO 7064 MOD 11,10 check digit
+function mod11_10(digits: string) {
+  let p = 10;
+  for (const s of digits) {
+    const t = (p + parseInt(s, 10)) % 10;
+    p = ((t === 0 ? 10 : t) * 2) % 11;
+  }
+  return (11 - p) % 10;
+}
+
+function generateHR(length: number) {
+  const body = randomDigits(length - 1);
+  return `${body}${mod11_10(body)}`;
+}
+
+// Iceland: the 9th digit of the kennitala checks the first 8 (10 is never valid)
+function kennitalaCheck(first8: string) {
+  const sum = first8.split("").reduce((acc, s, idx) => acc + parseInt(s, 10) * [3, 2, 7, 6, 5, 4, 3, 2][idx], 0);
+  return (11 - (sum % 11)) % 11;
 }
 
 /**
@@ -347,9 +425,9 @@ export class BbanStructure {
     //    https://www.cnb.cz/en/payments/iban/iban-international-bank-account-number-basic-information/
     [CountryCode.CZ]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
-      BbanStructurePart.branchCode(6, CharacterType.n),
-      BbanStructurePart.accountNumber(10, CharacterType.n),
-    ),
+      BbanStructurePart.branchCode(6, CharacterType.n, true, () => generateCZ(6)),
+      BbanStructurePart.accountNumber(10, CharacterType.n, true, () => generateCZ(10)),
+    ).withCheck((bban) => checkCZ(bban.substring(4, 10), bban.substring(10))),
 
     [CountryCode.DE]: new BbanStructure(
       BbanStructurePart.bankCode(8, CharacterType.n),
@@ -409,7 +487,12 @@ export class BbanStructure {
     //  https://www.finanssiala.fi/maksujenvalitys/dokumentit/IBAN_in_payments.pdf
     [CountryCode.FI]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(11, CharacterType.n),
+      BbanStructurePart.accountNumber(11, CharacterType.n, true, (bban) => {
+        const body = randomDigits(10);
+        return `${body}${luhn(`${bban.substring(0, 3)}${body}`)}`;
+      }),
+    ).withCheck((bban) =>
+      luhn(bban.substring(0, 13)) === parseInt(bban.substring(13), 10) ? null : "account number fails the Luhn check",
     ),
 
     [CountryCode.FK]: new BbanStructure(
@@ -474,9 +557,17 @@ export class BbanStructure {
     ),
 
     [CountryCode.HR]: new BbanStructure(
-      BbanStructurePart.bankCode(7, CharacterType.n),
-      BbanStructurePart.accountNumber(10, CharacterType.n),
-    ),
+      BbanStructurePart.bankCode(7, CharacterType.n, true, () => generateHR(7)),
+      BbanStructurePart.accountNumber(10, CharacterType.n, true, () => generateHR(10)),
+    ).withCheck((bban) => {
+      if (mod11_10(bban.substring(0, 6)) !== parseInt(bban.substring(6, 7), 10)) {
+        return "bank code fails the ISO 7064 MOD 11,10 check";
+      }
+      if (mod11_10(bban.substring(7, 16)) !== parseInt(bban.substring(16), 10)) {
+        return "account number fails the ISO 7064 MOD 11,10 check";
+      }
+      return null;
+    }),
 
     [CountryCode.HN]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -525,7 +616,19 @@ export class BbanStructure {
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountType(2, CharacterType.n, true),
       BbanStructurePart.accountNumber(6, CharacterType.n),
-      BbanStructurePart.identificationNumber(10, CharacterType.n),
+      BbanStructurePart.identificationNumber(10, CharacterType.n, true, () => {
+        for (;;) {
+          const body = randomDigits(8);
+          const check = kennitalaCheck(body);
+          if (check < 10) {
+            return `${body}${check}9`;
+          }
+        }
+      }),
+    ).withCheck((bban) =>
+      kennitalaCheck(bban.substring(12, 20)) === parseInt(bban.substring(20, 21), 10)
+        ? null
+        : "kennitala fails the mod 11 check",
     ),
 
     [CountryCode.IT]: new BbanStructure(
@@ -790,10 +893,11 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
+    // Account number is the 6 digit prefix + 10 digit number, as in CZ
     [CountryCode.SK]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
-      BbanStructurePart.accountNumber(16, CharacterType.n),
-    ),
+      BbanStructurePart.accountNumber(16, CharacterType.n, true, () => `${generateCZ(6)}${generateCZ(10)}`),
+    ).withCheck((bban) => checkCZ(bban.substring(4, 10), bban.substring(10))),
 
     [CountryCode.SM]: new BbanStructure(
       BbanStructurePart.nationalCheckDigit(1, CharacterType.a, nationalIT),
@@ -895,8 +999,18 @@ export class BbanStructure {
 
   private entries: BbanStructurePart[];
 
+  private check: BbanCheck | null = null;
+
   private constructor(...entries: BbanStructurePart[]) {
     this.entries = entries;
+  }
+
+  /**
+   * Add a check of check digits that live inside other parts
+   */
+  private withCheck(check: BbanCheck): BbanStructure {
+    this.check = check;
+    return this;
   }
 
   getParts(): BbanStructurePart[] {
@@ -906,6 +1020,11 @@ export class BbanStructure {
   validate(bban: string): void {
     this.validateBbanLength(bban);
     this.validateBbanEntries(bban);
+
+    const failure = this.check?.(bban, this) ?? null;
+    if (failure !== null) {
+      throw new FormatException(FormatViolation.NATIONAL_CHECK_DIGIT, `[${bban}] ${failure}`);
+    }
   }
 
   extractValue(bban: string, partType: PartType): string | null {

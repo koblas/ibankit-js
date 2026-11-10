@@ -239,7 +239,9 @@ export class IBANBuilder {
           "0",
         );
       } else if (fillRandom) {
-        this.values[partType] = parts.map((p) => p.generate("", structure)).join("");
+        // Generators see the BBAN filled so far, so a part can depend on the
+        // parts before it (e.g. the FI account number check covers the bank code)
+        this.values[partType] = parts.map((p) => p.generate(this.formatBban(), structure)).join("");
       } else {
         throw new FormatException(
           FormatViolation.NOT_NULL,
