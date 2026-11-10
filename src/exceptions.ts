@@ -32,6 +32,9 @@ export enum FormatViolation {
   ACCOUNT_NUMBER_NOT_NULL,
 
   BRANCH_CHECK_DIGIT,
+
+  // Appended to keep the numeric values of existing members stable
+  CHECK_DIGIT_RANGE,
 }
 
 export class FormatException extends Error {
