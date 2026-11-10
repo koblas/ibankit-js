@@ -20,8 +20,8 @@ Identifier Codes (BIC, [ISO_9362](http://en.wikipedia.org/wiki/ISO_9362)).
 
 ## SWIFT IBAN Registry
 
-This release should be compatible with the [SWIFT IBAN Registry
-Version 95](https://www.swift.com/swift-resource/9606/download). There may be a limited number
+This release should be compatible with the [SWIFT IBAN Registry](https://www.swift.com/standards/data-standards/iban)
+as published in September 2026. There may be a limited number
 of value differences, some countries in the Registry doesn't describe bank/branch information
 but may expose it as `3!n4!n` but leave the branch description as a blank.
 

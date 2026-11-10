@@ -120,7 +120,7 @@ export class BbanStructure {
     [CountryCode.AE]: new BbanStructure(
       // AE2!n3!n16!n
       BbanStructurePart.bankCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(16, CharacterType.c),
+      BbanStructurePart.accountNumber(16, CharacterType.n),
     ),
 
     [CountryCode.AL]: new BbanStructure(
@@ -189,7 +189,6 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(14, CharacterType.c),
     ),
 
-    // Provisional
     [CountryCode.BI]: new BbanStructure(
       // BI2!n5!n5!n11!n2!n
       //   Changed on October 21 (from 12!n)
@@ -208,11 +207,13 @@ export class BbanStructure {
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
     ),
 
+    // BR2!n8!c5!n10!n1!c1!c -- the bank code (ISPB) and account type became
+    // alphanumeric in the registry update effective August 2026.
     [CountryCode.BR]: new BbanStructure(
-      BbanStructurePart.bankCode(8, CharacterType.n),
+      BbanStructurePart.bankCode(8, CharacterType.c),
       BbanStructurePart.branchCode(5, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
-      BbanStructurePart.accountType(1, CharacterType.a),
+      BbanStructurePart.accountType(1, CharacterType.c),
       BbanStructurePart.ownerAccountNumber(1, CharacterType.c),
     ),
 
@@ -284,9 +285,8 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
-    // Provisional
     [CountryCode.DJ]: new BbanStructure(
-      // BI2!n5!n5!n11!n2!n
+      // DJ2!n5!n5!n11!n2!n
       //   Changed on May 22 (from France's standard)
       BbanStructurePart.bankCode(5, CharacterType.n),
       BbanStructurePart.branchCode(5, CharacterType.n),
@@ -396,8 +396,9 @@ export class BbanStructure {
 
     [CountryCode.GT]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.c),
-      BbanStructurePart.currencyType(2, CharacterType.n),
-      BbanStructurePart.accountType(2, CharacterType.n),
+      // Registry: 4!c20!c -- currency and account type are not restricted to digits
+      BbanStructurePart.currencyType(2, CharacterType.c),
+      BbanStructurePart.accountType(2, CharacterType.c),
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
@@ -406,7 +407,6 @@ export class BbanStructure {
       BbanStructurePart.accountNumber(10, CharacterType.n),
     ),
 
-    // Provisional
     [CountryCode.HN]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.accountNumber(20, CharacterType.n),
@@ -487,7 +487,7 @@ export class BbanStructure {
 
     [CountryCode.LC]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
-      BbanStructurePart.accountNumber(24, CharacterType.n),
+      BbanStructurePart.accountNumber(24, CharacterType.c),
     ),
 
     [CountryCode.LI]: new BbanStructure(
@@ -620,8 +620,8 @@ export class BbanStructure {
      * However, the Central Bank of Oman specifies it as 16!n.
      *
      * References:
-     * - SWIFT IBAN Registry (Release 99 – Dec 2024):
-     *   https://www.swift.com/swift-resource/22851/download
+     * - SWIFT IBAN Registry (16!c since Release 99, Dec 2024; unchanged Sep 2026):
+     *   https://www.swift.com/standards/data-standards/iban
      * - Central Bank of Oman IBAN Checker:
      *   https://cbo.gov.om/Pages/InternationalIBANChecker.aspx
      */
@@ -631,7 +631,7 @@ export class BbanStructure {
     ),
 
     [CountryCode.PK]: new BbanStructure(
-      BbanStructurePart.bankCode(4, CharacterType.c),
+      BbanStructurePart.bankCode(4, CharacterType.a),
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
@@ -774,23 +774,24 @@ export class BbanStructure {
     [CountryCode.TN]: new BbanStructure(
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(3, CharacterType.n),
-      BbanStructurePart.accountNumber(13, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.c),
+      BbanStructurePart.accountNumber(13, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
     ),
 
     [CountryCode.TR]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(1, CharacterType.c),
+      // Reserved digit, currently always 0 (registry 1!n)
+      BbanStructurePart.nationalCheckDigit(1, CharacterType.n),
       BbanStructurePart.accountNumber(16, CharacterType.c),
     ),
 
     [CountryCode.UA]: new BbanStructure(
       BbanStructurePart.bankCode(6, CharacterType.n),
-      BbanStructurePart.accountNumber(19, CharacterType.n),
+      BbanStructurePart.accountNumber(19, CharacterType.c),
     ),
 
     [CountryCode.VA]: new BbanStructure(
-      BbanStructurePart.bankCode(3, CharacterType.c),
+      BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(15, CharacterType.n),
     ),
 
@@ -804,6 +805,13 @@ export class BbanStructure {
       BbanStructurePart.branchCode(2, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.n),
       BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+    ),
+
+    [CountryCode.YE]: new BbanStructure(
+      // YE2!n4!a4!n18!c
+      BbanStructurePart.bankCode(4, CharacterType.a),
+      BbanStructurePart.branchCode(4, CharacterType.n),
+      BbanStructurePart.accountNumber(18, CharacterType.c),
     ),
   };
 
