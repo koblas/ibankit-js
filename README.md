@@ -83,6 +83,18 @@ BIC.isValid("DEUTDEFF500"); // === true
 - [iban-js](https://www.npmjs.com/package/iban) by ARHS Group
 - [iban4j](https://github.com/arturmkrtchyan/iban4j) by Artur Mkrtchyan
 
+## Release Notes
+
+Releases are managed by [release-please](https://github.com/googleapis/release-please).
+PRs are squash-merged and the PR title becomes the commit on `main`, so it must be a
+[Conventional Commit](https://www.conventionalcommits.org/) (`fix(MU): ...`,
+`feat: ...`); a CI check enforces it. `fix` bumps the patch version, `feat`
+the minor version, and `!` or a `BREAKING CHANGE:` footer the major version.
+
+Every push to `main` updates one release PR that bumps the version and prepends
+the `CHANGELOG.md` entry. Merging it tags the release, creates the GitHub release
+and publishes to npm with provenance (`.github/workflows/release.yaml`).
+
 ## License
 
 Copyright 2018-2023 David Koblas
