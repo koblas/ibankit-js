@@ -19,6 +19,10 @@ describe("IBAN", () => {
       // Genuine registry example stays valid.
       expect(IBAN.isValid("MU17BOMM0101101030300200000MUR")).toBe(true);
     });
+    it("MU bank code is 4!a2!n", () => {
+      expect(IBAN.isValid("MU52BOM10101101030300200000MUR")).toBe(false);
+      expect(IBAN.isValid("MU93BOMMA101101030300200000MUR")).toBe(false);
+    });
   });
 
   describe("Test check digit", () => {
@@ -351,8 +355,10 @@ describe("IBAN", () => {
     it("IS", () => {
       const iban = new IBAN("IS140159260076545510730339");
       expect(iban.getCountryCode()).toBe("IS");
-      expect(iban.getBankCode()).toBe("0159");
-      expect(iban.getBranchCode()).toBe("26");
+      // Registry: bank 1-2, branch 3-4; then the 2 digit ledger (account type)
+      expect(iban.getBankCode()).toBe("01");
+      expect(iban.getBranchCode()).toBe("59");
+      expect(iban.getAccountType()).toBe("26");
       expect(iban.getAccountNumber()).toBe("007654");
       expect(iban.getIdentificationNumber()).toBe("5510730339");
     });
@@ -606,9 +612,12 @@ describe("IBAN", () => {
     it("SC", () => {
       const iban = new IBAN("SC18SSCB11010000000000001497USD");
       expect(iban.getCountryCode()).toBe("SC");
-      expect(iban.getBankCode()).toBe("SSCB");
-      expect(iban.getBranchCode()).toBe("11");
-      expect(iban.getBranchCheckDigit()).toBe("01");
+      // Registry: bank 1-6 (4!a2!n), branch 7-8
+      expect(iban.getBankCode()).toBe("SSCB11");
+      expect(iban.getBranchCode()).toBe("01");
+      expect(iban.getBranchCheckDigit()).toBe(null);
+      // Letters then digits in the bank code
+      expect(IBAN.isValid("SC54SSC111010000000000001497USD")).toBe(false);
       expect(iban.getAccountNumber()).toBe("0000000000001497");
     });
 
