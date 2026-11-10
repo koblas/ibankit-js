@@ -175,7 +175,11 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.BF]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
+    // BCEAO (WAEMU) format, same as BJ, CI, ML, NE, SN, TG: 2c,22n
+    [CountryCode.BF]: new BbanStructure(
+      BbanStructurePart.bankCode(2, CharacterType.c),
+      BbanStructurePart.accountNumber(22, CharacterType.n),
+    ),
 
     [CountryCode.BG]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -553,9 +557,11 @@ export class BbanStructure {
     ),
 
     // Provisional
+    // BCEAO (WAEMU) format: 2c,22n. Bank codes start with the country code
+    // ("ML016") or, in the older form, a single letter ("D0089").
     [CountryCode.ML]: new BbanStructure(
-      BbanStructurePart.bankCode(1, CharacterType.a),
-      BbanStructurePart.accountNumber(25, CharacterType.n),
+      BbanStructurePart.bankCode(2, CharacterType.c),
+      BbanStructurePart.accountNumber(22, CharacterType.n),
     ),
 
     [CountryCode.MN]: new BbanStructure(

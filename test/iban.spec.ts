@@ -738,8 +738,13 @@ describe("IBAN", () => {
     });
 
     it("BF", () => {
-      const iban = new IBAN("BF2312345678901234567890123");
+      // BCEAO format, 28 characters: 2c bank prefix + 22n
+      const iban = new IBAN("BF42BF0840101300463574000390");
       expect(iban.getCountryCode()).toBe("BF");
+      expect(iban.getBankCode()).toBe("BF");
+      expect(IBAN.isValid("BF96B00840101300463574000390")).toBe(true);
+      // The old 27 character form is too short
+      expect(IBAN.isValid("BF2312345678901234567890123")).toBe(false);
     });
 
     it("BJ", () => {
@@ -800,11 +805,19 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("MG");
     });
 
-    // Conflicting information
-    // it("ML", () => {
-    //   const iban = new IBAN("ML1300016012010260010066849700");
-    //   expect(iban.getCountryCode()).toBe("ML");
-    // });
+    it("ML", () => {
+      // BCEAO format, 28 characters: 2c bank prefix + 22n. Bank codes start
+      // with the country code ("ML016") or, in the older form, one letter
+      // ("D0089"); both must be accepted (see #24).
+      const iban = new IBAN("ML13ML0160120102600100668497");
+      expect(iban.getCountryCode()).toBe("ML");
+      expect(iban.getBankCode()).toBe("ML");
+      expect(IBAN.isValid("ML03D00890170001002120000447")).toBe(true);
+      // The old 30 character form is too long
+      expect(IBAN.isValid("ML1300016012010260010066849700")).toBe(false);
+      // Digits only after the bank prefix
+      expect(IBAN.isValid("ML16ML016012010260010066849A")).toBe(false);
+    });
 
     it("MZ", () => {
       const iban = new IBAN("MZ25123456789012345678901");
