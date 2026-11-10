@@ -96,6 +96,32 @@ function nationalPT(bban: string, structure: BbanStructure) {
 }
 
 /**
+ * ISO 7064 MOD 97-10 over the whole BBAN (minus the check digits), as used by
+ * BA, ME, MK, RS, SI and TL: check = 98 - (bban * 100 mod 97).
+ *
+ * Letters (only possible in MK's 10!c account number) are expanded the same
+ * way as in the IBAN check (ISO 13616): A=10 ... Z=35.
+ */
+function nationalMod97(bban: string, structure: BbanStructure) {
+  let offset = 0;
+  const value = structure
+    .getParts()
+    .map((p) => {
+      const part = bban.substring(offset, offset + p.getLength());
+      offset += p.getLength();
+      return p.getPartType() === PartType.NATIONAL_CHECK_DIGIT ? "" : part;
+    })
+    .join("");
+
+  const remainder = `${value}00`
+    .split("")
+    .map((c) => parseInt(c, 36))
+    .reduce((acc, v) => (acc * (v < 10 ? 10 : 100) + v) % 97, 0);
+
+  return String(98 - remainder).padStart(2, "0");
+}
+
+/**
  * Class which represents bban structure
  *
  * Useful references --
@@ -147,7 +173,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.branchCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(8, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     [CountryCode.BE]: new BbanStructure(
@@ -541,7 +567,7 @@ export class BbanStructure {
     [CountryCode.ME]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(13, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n), // @TODO checkdigit
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     // Provisional
@@ -555,8 +581,7 @@ export class BbanStructure {
     [CountryCode.MK]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(10, CharacterType.c),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
-      // @TODO checkdigit
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     // Provisional
@@ -679,7 +704,7 @@ export class BbanStructure {
     [CountryCode.RS]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(13, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     [CountryCode.RU]: new BbanStructure(
@@ -721,7 +746,7 @@ export class BbanStructure {
       BbanStructurePart.bankCode(2, CharacterType.n),
       BbanStructurePart.branchCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(8, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     [CountryCode.SK]: new BbanStructure(
@@ -780,7 +805,7 @@ export class BbanStructure {
     [CountryCode.TL]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
       BbanStructurePart.accountNumber(14, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalMod97),
     ),
 
     [CountryCode.TN]: new BbanStructure(
