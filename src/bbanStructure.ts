@@ -109,7 +109,7 @@ export class BbanStructure {
     BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
   );
 
-  static structures: { [key in CountryCode]?: BbanStructure } = {
+  static structures: Partial<Record<CountryCode, BbanStructure>> = {
     [CountryCode.AD]: new BbanStructure(
       // AD2!n4!n4!n12!c
       BbanStructurePart.bankCode(4, CharacterType.n),
