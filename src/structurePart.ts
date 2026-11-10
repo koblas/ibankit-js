@@ -81,23 +81,15 @@ export class BbanStructurePart {
     this.trailingSeparator = trailingSeparator;
   }
 
-  static bankCode(length: number, characterType: CharacterType, trailingSeparator: boolean = true): BbanStructurePart {
+  static bankCode(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
     return new BbanStructurePart(PartType.BANK_CODE, characterType, length, trailingSeparator);
   }
 
-  static branchCode(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = true,
-  ): BbanStructurePart {
+  static branchCode(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
     return new BbanStructurePart(PartType.BRANCH_CODE, characterType, length, trailingSeparator);
   }
 
-  static accountNumber(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = true,
-  ): BbanStructurePart {
+  static accountNumber(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
     return new BbanStructurePart(PartType.ACCOUNT_NUMBER, characterType, length, trailingSeparator);
   }
 
@@ -105,7 +97,7 @@ export class BbanStructurePart {
     length: number,
     characterType: CharacterType,
     generate?: GenerateValue,
-    trailingSeparator: boolean = false,
+    trailingSeparator = false,
   ): BbanStructurePart {
     return new BbanStructurePart(PartType.NATIONAL_CHECK_DIGIT, characterType, length, trailingSeparator, generate);
   }
@@ -114,39 +106,27 @@ export class BbanStructurePart {
     length: number,
     characterType: CharacterType,
     generate?: GenerateValue,
-    trailingSeparator: boolean = false,
+    trailingSeparator = false,
   ): BbanStructurePart {
     return new BbanStructurePart(PartType.BRANCH_CHECK_DIGIT, characterType, length, trailingSeparator, generate);
   }
 
-  static accountType(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = false,
-  ): BbanStructurePart {
+  static accountType(length: number, characterType: CharacterType, trailingSeparator = false): BbanStructurePart {
     return new BbanStructurePart(PartType.ACCOUNT_TYPE, characterType, length, trailingSeparator);
   }
 
-  static currencyType(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = false,
-  ): BbanStructurePart {
+  static currencyType(length: number, characterType: CharacterType, trailingSeparator = false): BbanStructurePart {
     return new BbanStructurePart(PartType.CURRENCY_TYPE, characterType, length, trailingSeparator);
   }
 
-  static ownerAccountNumber(
-    length: number,
-    characterType: CharacterType,
-    trailingSeparator: boolean = true,
-  ): BbanStructurePart {
+  static ownerAccountNumber(length: number, characterType: CharacterType, trailingSeparator = true): BbanStructurePart {
     return new BbanStructurePart(PartType.OWNER_ACCOUNT_NUMBER, characterType, length, trailingSeparator);
   }
 
   static identificationNumber(
     length: number,
     characterType: CharacterType,
-    trailingSeparator: boolean = true,
+    trailingSeparator = true,
   ): BbanStructurePart {
     return new BbanStructurePart(PartType.IDENTIFICATION_NUMBER, characterType, length, trailingSeparator);
   }

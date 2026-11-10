@@ -2,7 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "outDir": "./lib/cjs"
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["vitest/globals", "node"]
   },
+  "files": [],
+  "include": ["src/**/*", "test/**/*"],
   "exclude": ["lib", "node_modules"]
 }

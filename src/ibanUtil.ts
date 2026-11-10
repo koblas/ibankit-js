@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { CountryCode, countryByCode } from "./country";
 import { BbanStructure } from "./bbanStructure";
 import { PartType } from "./structurePart";
@@ -273,7 +272,7 @@ export function replaceCheckDigit(iban: string, checkDigit: string): string {
  *
  * @return A string representing formatted Iban for printing.
  */
-export function toFormattedString(iban: string, separator: string = " "): string {
+export function toFormattedString(iban: string, separator = " "): string {
   return iban.replace(/(.{4})(?!$)/g, `$1${separator}`).trim();
 }
 
@@ -281,7 +280,7 @@ export function toFormattedString(iban: string, separator: string = " "): string
  *
  * @return A string representing formatted BBAN in "national" format
  */
-export function toFormattedStringBBAN(iban: string, separator: string = " "): string {
+export function toFormattedStringBBAN(iban: string, separator = " "): string {
   const structure = getBbanStructure(iban);
 
   if (structure === null) {

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "importHelpers": false,
     "target": "es6",
@@ -27,12 +27,19 @@
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
     "jsx": "react",
-    "lib": ["es2017", "es2016", "dom"],
-    "baseUrl": ".",
-    "paths": {
-      "*": ["src/*", "node_modules/*"]
-    }
+    "lib": [
+      "es2017",
+      "es2016",
+      "dom"
+    ],
+    "rootDir": "./src"
   },
-  "exclude": ["lib", "node_modules", "**/*.spec.*"],
-  "files": ["src/index.ts"]
+  "exclude": [
+    "lib",
+    "node_modules",
+    "**/*.spec.*"
+  ],
+  "files": [
+    "src/index.ts"
+  ]
 }

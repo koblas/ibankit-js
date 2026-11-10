@@ -142,7 +142,7 @@ export class IBANBuilder {
    *  <a href="http://en.wikipedia.org/wiki/ISO_13616">ISO_13616</a>
    * @exception UnsupportedCountryException if country is not supported
    */
-  build(fillRandom: boolean = true, validate: boolean = true): IBAN {
+  build(fillRandom = true, validate = true): IBAN {
     if (fillRandom && this.countryCodeValue == null) {
       const countryCodes = BbanStructure.supportedCountries();
 

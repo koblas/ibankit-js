@@ -288,7 +288,7 @@ export class IBAN {
    * @param {String} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
    * @returns {string|*}
    */
-  static toBBAN(iban: string, separator: string = " "): string {
+  static toBBAN(iban: string, separator = " "): string {
     const clean = IBAN.electronicFormat(iban);
     ibanUtil.validate(clean);
     return ibanUtil.toFormattedStringBBAN(clean, separator);
@@ -336,7 +336,7 @@ export class IBAN {
    * @param separator optional (default ' ')
    * @returns {string}
    */
-  static printFormat(iban: string, separator: string = " "): string {
+  static printFormat(iban: string, separator = " "): string {
     return ibanUtil.toFormattedString(iban, separator);
   }
 
