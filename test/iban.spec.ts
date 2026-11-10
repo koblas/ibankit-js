@@ -1,4 +1,4 @@
-import { IBAN } from "../src";
+import { IBAN, BbanStructure } from "../src";
 
 describe("IBAN", () => {
   describe("test IBAN.isValid", () => {
@@ -536,7 +536,6 @@ describe("IBAN", () => {
       expect(iban.getCountryCode()).toBe("OM");
       expect(iban.getBankCode()).toBe("018");
       expect(iban.getAccountNumber()).toBe("0010080577149017");
-
     });
 
     it("PK", () => {
@@ -747,11 +746,14 @@ describe("IBAN", () => {
     });
 
     it("BF", () => {
-      // BCEAO format, 28 characters: 2c bank prefix + 22n
+      // BCEAO RIB format, 28 characters: 5 character bank code, 5n branch,
+      // 12n account, 2n RIB key
       const iban = new IBAN("BF42BF0840101300463574000390");
       expect(iban.getCountryCode()).toBe("BF");
-      expect(iban.getBankCode()).toBe("BF");
-      expect(IBAN.isValid("BF96B00840101300463574000390")).toBe(true);
+      expect(iban.getBankCode()).toBe("BF084");
+      expect(iban.getBranchCode()).toBe("01013");
+      expect(iban.getAccountNumber()).toBe("004635740003");
+      expect(iban.getNationalCheckDigit()).toBe("90");
       // The old 27 character form is too short
       expect(IBAN.isValid("BF2312345678901234567890123")).toBe(false);
     });
@@ -775,7 +777,7 @@ describe("IBAN", () => {
     });
 
     it("CM", () => {
-      const iban = new IBAN("CM9012345678901234567890123");
+      const iban = new IBAN("CM2110001068606534216000156"); // Assauvet (BICEC), assauvet.org
       expect(iban.getCountryCode()).toBe("CM");
     });
 
@@ -810,17 +812,17 @@ describe("IBAN", () => {
     });
 
     it("MG", () => {
-      const iban = new IBAN("MG4600005000414382396020068") // ONG Bel Avenir (BNI), ongbelavenir.org;
+      const iban = new IBAN("MG4600005000414382396020068"); // ONG Bel Avenir (BNI), ongbelavenir.org
       expect(iban.getCountryCode()).toBe("MG");
     });
 
     it("ML", () => {
-      // BCEAO format, 28 characters: 2c bank prefix + 22n. Bank codes start
-      // with the country code ("ML016") or, in the older form, one letter
-      // ("D0089"); both must be accepted (see #24).
+      // BCEAO RIB format, 28 characters. Bank codes start with the country
+      // code ("ML016") or, in the older form, one letter ("D0089"); both must
+      // be accepted (see #24).
       const iban = new IBAN("ML13ML0160120102600100668497");
       expect(iban.getCountryCode()).toBe("ML");
-      expect(iban.getBankCode()).toBe("ML");
+      expect(iban.getBankCode()).toBe("ML016");
       expect(IBAN.isValid("ML03D00890170001002120000447")).toBe(true);
       // The old 30 character form is too long
       expect(IBAN.isValid("ML1300016012010260010066849700")).toBe(false);
@@ -834,7 +836,7 @@ describe("IBAN", () => {
     });
 
     it("SN", () => {
-      const iban = new IBAN("SN52A12345678901234567890123");
+      const iban = new IBAN("SN08SN0100152300774120009210"); // Association Éducation Solidaire (BICIS), ecolespiesinstitutions.org
       expect(iban.getCountryCode()).toBe("SN");
     });
 
@@ -894,6 +896,10 @@ describe("IBAN", () => {
   });
 
   describe("sample value", () => {
+    it.each(BbanStructure.supportedCountries())("%s sample is valid", (cc) => {
+      expect(IBAN.isValid(IBAN.sample(cc))).toBe(true);
+    });
+
     it("FR", () => {
       expect(IBAN.sample("FR")).toBe("FR1420041010050500013M02606");
     });

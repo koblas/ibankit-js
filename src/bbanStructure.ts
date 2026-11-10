@@ -254,6 +254,30 @@ export class BbanStructure {
     BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
   );
 
+  // CEMAC (CF, CG, CM, TD) and Comoros: RIB format, 5n bank, 5n branch,
+  // 11n account, 2n RIB key (same key as France)
+  private static bbanCEMAC = new BbanStructure(
+    BbanStructurePart.bankCode(5, CharacterType.n),
+    BbanStructurePart.branchCode(5, CharacterType.n),
+    BbanStructurePart.accountNumber(11, CharacterType.n),
+    BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
+  );
+
+  /**
+   * BCEAO (WAEMU) RIB format: the 5 character bank code starts with the
+   * country code ("ML016") or, in the older form, one letter ("D0089"),
+   * followed by 5n branch, 12n account and the 2n RIB key (same key as France).
+   */
+  private static bbanBCEAO(prefix: CharacterType) {
+    return new BbanStructure(
+      BbanStructurePart.bankCode(2, prefix, false),
+      BbanStructurePart.bankCode(3, CharacterType.n),
+      BbanStructurePart.branchCode(5, CharacterType.n),
+      BbanStructurePart.accountNumber(12, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
+    );
+  }
+
   static structures: Partial<Record<CountryCode, BbanStructure>> = {
     [CountryCode.AD]: new BbanStructure(
       // AD2!n4!n4!n12!c
@@ -320,11 +344,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    // BCEAO (WAEMU) format, same as BJ, CI, ML, NE, SN, TG: 2c,22n
-    [CountryCode.BF]: new BbanStructure(
-      BbanStructurePart.bankCode(2, CharacterType.c),
-      BbanStructurePart.accountNumber(22, CharacterType.n),
-    ),
+    [CountryCode.BF]: BbanStructure.bbanBCEAO(CharacterType.c),
 
     [CountryCode.BG]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -349,12 +369,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.BJ]: new BbanStructure(
-      BbanStructurePart.bankCode(5, CharacterType.c),
-      BbanStructurePart.branchCode(5, CharacterType.n),
-      BbanStructurePart.accountNumber(12, CharacterType.n),
-      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
-    ),
+    [CountryCode.BJ]: BbanStructure.bbanBCEAO(CharacterType.c),
 
     // BR2!n8!c5!n10!n1!c1!c -- the bank code (ISPB) and account type became
     // alphanumeric in the registry update effective August 2026.
@@ -381,16 +396,10 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.CF]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-      // @TODO is this france?
-    ),
+    [CountryCode.CF]: BbanStructure.bbanCEMAC,
 
     // Provisional
-    [CountryCode.CG]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-      // @TODO is this france?
-    ),
+    [CountryCode.CG]: BbanStructure.bbanCEMAC,
 
     [CountryCode.CH]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
@@ -398,13 +407,10 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.CI]: new BbanStructure(
-      BbanStructurePart.bankCode(2, CharacterType.c),
-      BbanStructurePart.accountNumber(22, CharacterType.n),
-    ),
+    [CountryCode.CI]: BbanStructure.bbanBCEAO(CharacterType.c),
 
     // Provisional
-    [CountryCode.CM]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
+    [CountryCode.CM]: BbanStructure.bbanCEMAC,
 
     [CountryCode.CR]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.n),
@@ -645,7 +651,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.KM]: new BbanStructure(BbanStructurePart.accountNumber(23, CharacterType.n)),
+    [CountryCode.KM]: BbanStructure.bbanCEMAC,
 
     [CountryCode.KW]: new BbanStructure(
       BbanStructurePart.bankCode(4, CharacterType.a),
@@ -694,7 +700,13 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.MA]: new BbanStructure(BbanStructurePart.accountNumber(24, CharacterType.n)),
+    // RIB: 3n bank, 3n city, 16n account, 2n RIB key (same key as France)
+    [CountryCode.MA]: new BbanStructure(
+      BbanStructurePart.bankCode(3, CharacterType.n),
+      BbanStructurePart.branchCode(3, CharacterType.n),
+      BbanStructurePart.accountNumber(16, CharacterType.n),
+      BbanStructurePart.nationalCheckDigit(2, CharacterType.n, nationalFR),
+    ),
 
     [CountryCode.MC]: new BbanStructure(
       BbanStructurePart.bankCode(5, CharacterType.n),
@@ -729,12 +741,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    // BCEAO (WAEMU) format: 2c,22n. Bank codes start with the country code
-    // ("ML016") or, in the older form, a single letter ("D0089").
-    [CountryCode.ML]: new BbanStructure(
-      BbanStructurePart.bankCode(2, CharacterType.c),
-      BbanStructurePart.accountNumber(22, CharacterType.n),
-    ),
+    [CountryCode.ML]: BbanStructure.bbanBCEAO(CharacterType.c),
 
     [CountryCode.MN]: new BbanStructure(
       // MN2!n4!n12!n
@@ -773,10 +780,7 @@ export class BbanStructure {
     [CountryCode.MZ]: new BbanStructure(BbanStructurePart.accountNumber(21, CharacterType.n)),
 
     // Provisional
-    [CountryCode.NE]: new BbanStructure(
-      BbanStructurePart.bankCode(2, CharacterType.a),
-      BbanStructurePart.accountNumber(22, CharacterType.n),
-    ),
+    [CountryCode.NE]: BbanStructure.bbanBCEAO(CharacterType.a),
 
     [CountryCode.NI]: new BbanStructure(
       // NI2!n4!a20!n
@@ -907,11 +911,7 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.SN]: new BbanStructure(
-      BbanStructurePart.bankCode(5, CharacterType.c),
-      BbanStructurePart.branchCode(5, CharacterType.n),
-      BbanStructurePart.accountNumber(14, CharacterType.n),
-    ),
+    [CountryCode.SN]: BbanStructure.bbanBCEAO(CharacterType.c),
 
     [CountryCode.SO]: new BbanStructure(
       // SO2!n4!n3!n12!n
@@ -936,16 +936,10 @@ export class BbanStructure {
     ),
 
     // Provisional
-    [CountryCode.TG]: new BbanStructure(
-      BbanStructurePart.bankCode(2, CharacterType.a),
-      BbanStructurePart.accountNumber(22, CharacterType.n),
-    ),
+    [CountryCode.TG]: BbanStructure.bbanBCEAO(CharacterType.a),
 
     // Provisional
-    [CountryCode.TD]: new BbanStructure(
-      BbanStructurePart.accountNumber(23, CharacterType.n),
-      // @TODO is this france?
-    ),
+    [CountryCode.TD]: BbanStructure.bbanCEMAC,
 
     [CountryCode.TL]: new BbanStructure(
       BbanStructurePart.bankCode(3, CharacterType.n),
